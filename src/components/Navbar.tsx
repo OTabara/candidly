@@ -89,7 +89,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
             ) {
               clearAllApplications();
               setEditingApplication(null);
-              setIsAddModalOpen(true);
             }
           }}
           title="Réinitialiser l'espace et commencer mon vrai suivi"
