@@ -481,34 +481,68 @@ export const ApplicationModal: React.FC = () => {
               {/* CV Utilisé */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  CV envoyé
+                  CV envoyé (Fichier PDF/DOCX)
                 </label>
-                <div className="relative">
-                  <FileText className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    value={resumeUsed}
-                    onChange={(e) => setResumeUsed(e.target.value)}
-                    placeholder="CV_Tabara_Doumouya_Data.pdf"
-                    className="w-full rounded-xl border border-slate-300 pl-9 pr-3 py-2 text-xs focus:ring-2 focus:ring-teal-600 dark:border-slate-700 dark:bg-slate-800/80 dark:text-white"
-                  />
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 cursor-pointer flex items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-[#F4F8F9] px-3 py-2 text-xs text-slate-600 hover:bg-[#E6F0F2] transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                    <FileText className="h-4 w-4 text-[#185868] shrink-0" />
+                    <span className="truncate flex-1 font-medium">
+                      {resumeUsed || userProfile.primaryResume || 'Choisir un fichier CV (.pdf, .docx)...'}
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setResumeUsed(file.name);
+                      }}
+                    />
+                  </label>
+                  {resumeUsed && (
+                    <button
+                      type="button"
+                      onClick={() => setResumeUsed('')}
+                      className="text-slate-400 hover:text-rose-500 p-1.5 transition-colors"
+                      title="Retirer le fichier"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </div>
 
               {/* Lettre de motivation */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Lettre de motivation envoyée
+                  Lettre de motivation (Fichier PDF/DOCX)
                 </label>
-                <div className="relative">
-                  <FileText className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    value={coverLetterUsed}
-                    onChange={(e) => setCoverLetterUsed(e.target.value)}
-                    placeholder="LM_Orange_Data.pdf"
-                    className="w-full rounded-xl border border-slate-300 pl-9 pr-3 py-2 text-xs focus:ring-2 focus:ring-teal-600 dark:border-slate-700 dark:bg-slate-800/80 dark:text-white"
-                  />
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 cursor-pointer flex items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-[#F4F8F9] px-3 py-2 text-xs text-slate-600 hover:bg-[#E6F0F2] transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                    <FileText className="h-4 w-4 text-[#2A9D8F] shrink-0" />
+                    <span className="truncate flex-1 font-medium">
+                      {coverLetterUsed || 'Choisir une lettre de motivation (.pdf, .docx)...'}
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setCoverLetterUsed(file.name);
+                      }}
+                    />
+                  </label>
+                  {coverLetterUsed && (
+                    <button
+                      type="button"
+                      onClick={() => setCoverLetterUsed('')}
+                      className="text-slate-400 hover:text-rose-500 p-1.5 transition-colors"
+                      title="Retirer le fichier"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
