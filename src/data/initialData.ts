@@ -111,8 +111,8 @@ export const DEFAULT_USER_PROFILE: UserProfile = {
   email: 'alex.dupont@example.com',
   phone: '+33 6 00 00 00 00',
   city: 'Paris, France',
-  education: 'Master Informatique & Management des SI',
-  specialization: 'Ingénierie & Gestion de Projets Web',
+  education: 'Master Informatique et Management des SI',
+  specialization: 'Ingénierie et Gestion de Projets Web',
   skills: [
     'React / TypeScript',
     'SQL / PostgreSQL',
@@ -135,7 +135,7 @@ export const INITIAL_APPLICATIONS: JobApplication[] = [
   {
     id: 'app-01',
     company: 'Orange Business',
-    jobTitle: 'Data Analyst & Process Mining',
+    jobTitle: 'Data Analyst et Process Mining',
     contractType: 'Stage',
     domain: 'Data',
     location: 'Toulouse (Labège)',
@@ -147,7 +147,7 @@ export const INITIAL_APPLICATIONS: JobApplication[] = [
     recruiterEmail: 'sophie.bernard@orange.com',
     recruiterPhone: '+33 5 61 00 22 11',
     nextFollowUpDate: '2026-09-26', // Demain
-    notes: 'Équipe Innovation & Big Data. Entretien téléphonique RH de 20 min validé. Équipe très bienveillante, orientée optimisation des processus de facturation.',
+    notes: 'Équipe Innovation et Big Data. Entretien téléphonique RH de 20 min validé. Équipe très bienveillante, orientée optimisation des processus de facturation.',
     resumeUsed: 'CV_Alex_Dupont_Data.pdf',
     coverLetterUsed: 'LM_Orange_Business_Data.pdf',
     logoBg: 'bg-orange-500',
@@ -194,7 +194,7 @@ export const INITIAL_APPLICATIONS: JobApplication[] = [
   {
     id: 'app-02',
     company: 'Wavestone',
-    jobTitle: 'Consultant Data & Process Excellence',
+    jobTitle: 'Consultant Data et Process Excellence',
     contractType: 'CDI',
     domain: 'Business Intelligence',
     location: 'Paris (La Défense)',
@@ -251,7 +251,7 @@ export const INITIAL_APPLICATIONS: JobApplication[] = [
       {
         id: 'tl-6',
         date: '2026-09-28',
-        title: 'Grand Oral Technique & Cas',
+        title: 'Grand Oral Technique et Cas',
         description: 'Entretien technique prévu à Paris La Défense.',
         type: 'INTERVIEW',
       },
@@ -275,7 +275,7 @@ export const INITIAL_APPLICATIONS: JobApplication[] = [
     recruiterEmail: 'emilie.roux@capgemini.com',
     recruiterPhone: '+33 5 62 74 80 00',
     nextFollowUpDate: '2026-09-30',
-    notes: 'Practice Insights & Data. Sujet axé sur la mise en place de tableaux de bord Power BI et pipeline de données pour Airbus.',
+    notes: 'Practice Insights et Data. Sujet axé sur la mise en place de tableaux de bord Power BI et pipeline de données pour Airbus.',
     resumeUsed: 'CV_Alex_Dupont_BI.pdf',
     coverLetterUsed: 'LM_Capgemini_BI_Toulouse.pdf',
     logoBg: 'bg-blue-600',
@@ -289,7 +289,7 @@ export const INITIAL_APPLICATIONS: JobApplication[] = [
         type: 'STATUS_CHANGE',
       },
     ],
-    tags: ['Power BI', 'Insights & Data', 'Toulouse', 'SQL'],
+    tags: ['Power BI', 'Insights et Data', 'Toulouse', 'SQL'],
     createdAt: '2026-09-18T10:30:00Z',
     updatedAt: '2026-09-18T10:30:00Z',
   },
@@ -368,7 +368,7 @@ export const INITIAL_APPLICATIONS: JobApplication[] = [
   {
     id: 'app-05',
     company: 'Thales',
-    jobTitle: 'Stage Data & Analyse Décisionnelle',
+    jobTitle: 'Stage Data et Analyse Décisionnelle',
     contractType: 'Stage',
     domain: 'Data',
     location: 'Toulouse (Labège)',
@@ -431,7 +431,7 @@ export const INITIAL_APPLICATIONS: JobApplication[] = [
   {
     id: 'app-06',
     company: 'Airbus',
-    jobTitle: 'Junior Project Management Officer & BI',
+    jobTitle: 'Junior Project Management Officer et BI',
     contractType: 'Alternance',
     domain: 'Consulting / AMOA',
     location: 'Toulouse (Blagnac)',

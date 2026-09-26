@@ -225,7 +225,7 @@ export const ApplicationsView: React.FC = () => {
             className="flex items-center gap-1.5 rounded-xl bg-[#185868] px-4 py-2 text-xs font-bold text-white shadow-md shadow-[#185868]/20 transition-all hover:bg-[#124552] active:scale-95"
           >
             <Plus className="h-4 w-4" />
-            <span>+ Ajouter une candidature</span>
+            <span>Ajouter une candidature</span>
           </button>
         </div>
       </div>
