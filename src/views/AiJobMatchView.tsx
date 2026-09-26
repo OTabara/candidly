@@ -144,7 +144,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
       <div>
         <div className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800 dark:bg-teal-950/60 dark:text-teal-300 mb-2">
           <Sparkles className="h-3.5 w-3.5 text-teal-500" />
-          <span>Fonctionnalité IA — Version 2 (Conception & Prototype)</span>
+          <span>Fonctionnalité IA — Version 2 (Conception et Prototype)</span>
         </div>
         <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
           AI Job Match : Analyseur d'Offres d'Emploi
@@ -285,7 +285,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
           {/* Keywords */}
           <div className="rounded-xl bg-white p-4 border border-slate-200 shadow-xs dark:bg-slate-900 dark:border-slate-800">
             <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2">
-              Mots-clés importants détectés pour le CV & la LM
+              Mots-clés importants détectés pour le CV et la LM
             </h4>
             <div className="flex flex-wrap gap-2">
               {analysisResult.keywords.map((kw) => (

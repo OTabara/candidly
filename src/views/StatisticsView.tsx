@@ -80,10 +80,10 @@ export const StatisticsView: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
-          Statistiques & Ratios de Conversion
+          Statistiques et Ratios de Conversion
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          Analyse quantitative de l'efficacité de vos candidatures Master 2 MIAGE
+          Analyse quantitative de l'efficacité de vos candidatures
         </p>
       </div>
 
@@ -174,7 +174,7 @@ export const StatisticsView: React.FC = () => {
           {/* Step 2 */}
           <div>
             <div className="flex justify-between text-xs font-semibold mb-1">
-              <span className="text-slate-700 dark:text-slate-300">2. Retours & Prises de contact</span>
+              <span className="text-slate-700 dark:text-slate-300">2. Retours et Prises de contact</span>
               <span className="font-mono text-slate-900 dark:text-white">
                 {answered} ({responseRate}%)
               </span>
@@ -206,7 +206,7 @@ export const StatisticsView: React.FC = () => {
           {/* Step 4 */}
           <div>
             <div className="flex justify-between text-xs font-semibold mb-1">
-              <span className="text-slate-700 dark:text-slate-300">4. Propositions & Offres formelles</span>
+              <span className="text-slate-700 dark:text-slate-300">4. Propositions et Offres formelles</span>
               <span className="font-mono text-slate-900 dark:text-white">
                 {offers} ({total > 0 ? Math.round((offers / total) * 100) : 0}%)
               </span>
@@ -271,11 +271,11 @@ export const StatisticsView: React.FC = () => {
           </div>
 
           <p className="mt-4 text-[11px] text-slate-500 border-t border-slate-100 pt-3 dark:border-slate-800">
-            📈 La période septembre-octobre est traditionnellement la plus active pour les recrutements de stages de fin d'études en Master MIAGE.
+            📈 La période septembre-octobre est traditionnellement la plus active pour les recrutements de stages et premier emploi.
           </p>
         </div>
 
-        {/* Répartition par ville & par contrat */}
+        {/* Répartition par ville et par contrat */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-6">
           {/* Villes */}
           <div>

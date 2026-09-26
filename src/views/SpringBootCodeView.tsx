@@ -426,10 +426,10 @@ public class SecurityConfig {
       <div>
         <div className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800 dark:bg-cyan-950/60 dark:text-teal-400 mb-2">
           <Server className="h-3.5 w-3.5" />
-          <span>Architecture Backend & Portfolio M2 MIAGE</span>
+          <span>Architecture Backend et Portfolio</span>
         </div>
         <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
-          Code Source Spring Boot 3 & PostgreSQL
+          Code Source Spring Boot 3 et PostgreSQL
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400">
           Consultez et exportez l'architecture complète Java Spring Boot, JPA, Spring Security et les tables relationnelles PostgreSQL pour votre projet local dans Visual Studio Code et GitHub.

@@ -134,7 +134,7 @@ export const CalendarView: React.FC = () => {
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
-            Calendrier des entretiens & relances
+            Calendrier des entretiens et relances
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Visualisez vos rendez-vous, rappels et étapes de recrutement
@@ -330,7 +330,7 @@ export const CalendarView: React.FC = () => {
           </div>
 
           <div className="mt-6 rounded-xl bg-[#F4EFE6] p-3 text-[11px] text-slate-600 dark:bg-slate-800/60 dark:text-slate-400 border border-slate-100 dark:border-slate-800">
-            💡 <strong>Conseil MIAGE :</strong> Relancez systématiquement 5 à 7 jours ouvrés après l'envoi d'une candidature sans réponse.
+            💡 <strong>Conseil :</strong> Relancez systématiquement 5 à 7 jours ouvrés après l'envoi d'une candidature sans réponse.
           </div>
         </div>
       </div>

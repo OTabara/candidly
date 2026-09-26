@@ -295,10 +295,10 @@ export const ApplicationModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Section 2: Statut & Dates */}
+          {/* Section 2: Statut et Dates */}
           <div className="space-y-4 pt-3 border-t border-slate-100 dark:border-slate-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-500">
-              2. Statut & Calendrier
+              2. Statut et Calendrier
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -372,10 +372,10 @@ export const ApplicationModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Section 3: Recruteur & Lien */}
+          {/* Section 3: Recruteur et Lien */}
           <div className="space-y-4 pt-3 border-t border-slate-100 dark:border-slate-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-500">
-              3. Contact & Rémunération
+              3. Contact et Rémunération
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -471,10 +471,10 @@ export const ApplicationModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Section 4: Documents & Notes */}
+          {/* Section 4: Documents et Notes */}
           <div className="space-y-4 pt-3 border-t border-slate-100 dark:border-slate-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-500">
-              4. Documents & Notes
+              4. Documents et Notes
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -550,7 +550,7 @@ export const ApplicationModal: React.FC = () => {
             {/* Tags */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Tags & Mots-clés (séparés par des virgules)
+                Tags et Mots-clés (séparés par des virgules)
               </label>
               <div className="relative">
                 <Tag className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />

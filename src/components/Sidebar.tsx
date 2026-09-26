@@ -31,9 +31,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile })
       badge: applications.length,
     },
     { id: 'kanban', label: 'Vue Kanban', icon: Kanban },
-    { id: 'calendar', label: 'Calendrier & Relances', icon: Calendar },
-    { id: 'statistics', label: 'Statistiques & Ratios', icon: BarChart3 },
-    { id: 'profile', label: 'Profil M2 MIAGE', icon: User },
+    { id: 'calendar', label: 'Calendrier et Relances', icon: Calendar },
+    { id: 'statistics', label: 'Statistiques et Ratios', icon: BarChart3 },
+    { id: 'profile', label: 'Profil Candidat', icon: User },
     {
       id: 'ai-match',
       label: 'AI Job Match',
@@ -42,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile })
     },
     {
       id: 'spring-code',
-      label: 'Code Spring Boot & BDD',
+      label: 'Code Spring Boot et BDD',
       icon: Code2,
       badge: 'Portfolio',
     },
@@ -102,13 +102,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile })
               </div>
               <div>
                 <p className="text-xs font-bold text-[#185868] dark:text-slate-100">
-                  Master 2 MIAGE
+                  Espace Candidat
                 </p>
                 <p className="text-[11px] text-[#52707D] dark:text-slate-400 leading-tight">
-                  Ingénierie Processus Métiers
+                  Gestion de Carrière
                 </p>
                 <span className="mt-1.5 inline-flex items-center rounded-md bg-[#D9ECF0] px-1.5 py-0.5 text-[10px] font-semibold text-[#185868] dark:bg-teal-950 dark:text-teal-300">
-                  Stage / 1er emploi 2026
+                  Recherche d'emploi 2026
                 </span>
               </div>
             </div>

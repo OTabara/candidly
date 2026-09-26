@@ -100,7 +100,7 @@ export const ProfileView: React.FC = () => {
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-xl font-extrabold tracking-tight text-[#185868] dark:text-white sm:text-2xl">
-            Profil Candidat & CV
+            Profil Candidat et CV
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Gérez vos informations de candidature et le matching IA
@@ -276,7 +276,7 @@ export const ProfileView: React.FC = () => {
           {/* Bio / Synthèse */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Présentation & Projet Professionnel
+              Présentation et Projet Professionnel
             </label>
             {isEditing ? (
               <textarea
@@ -324,7 +324,7 @@ export const ProfileView: React.FC = () => {
           <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                Compétences & Technologies maîtrisées
+                Compétences et Technologies maîtrisées
               </label>
               <span className="text-[11px] text-slate-400">Utilisées par l'algorithme AI Job Match</span>
             </div>
@@ -369,7 +369,7 @@ export const ProfileView: React.FC = () => {
             )}
           </div>
 
-          {/* Domaines & Contrats ciblés */}
+          {/* Domaines et Contrats ciblés */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-100 dark:border-slate-800">
             {/* Domaines */}
             <div>
