@@ -20,6 +20,9 @@
   <br /><br />
   <p><b>Liste des Candidatures & Filtrage</b></p>
   <img src="docs/screenshots/applications.png" alt="Liste des Candidatures Candidly" width="90%" />
+  <br /><br />
+  <p><b>Statistiques & Ratios de Conversion</b></p>
+  <img src="docs/screenshots/statistics.png" alt="Statistiques Candidly" width="90%" />
 </div>
 
 ---
