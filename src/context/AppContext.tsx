@@ -51,6 +51,10 @@ interface AppContextType {
   resetToDemoData: () => void;
   clearAllApplications: () => void;
   
+  // Storage Export / Import
+  exportData: () => void;
+  importData: (fileContent: string) => boolean;
+  
   // Toast notifications
   toasts: ToastMessage[];
   addToast: (message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
@@ -335,6 +339,83 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     addToast('Espace réinitialisé ! Vous pouvez maintenant ajouter vos vraies candidatures.', 'success');
   };
 
+  const exportData = () => {
+    try {
+      const backupData = {
+        version: '1.0',
+        exportedAt: new Date().toISOString(),
+        applications,
+        userProfile,
+        readNotifications: JSON.parse(localStorage.getItem('candidly_read_notifs') || '[]'),
+      };
+
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const todayStr = new Date().toISOString().substring(0, 10);
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', `candidly_sauvegarde_${todayStr}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      addToast('Fichier de sauvegarde téléchargé avec succès !', 'success');
+    } catch (e) {
+      console.error(e);
+      addToast('Erreur lors du téléchargement de la sauvegarde.', 'error');
+    }
+  };
+
+  const importData = (fileContent: string): boolean => {
+    try {
+      const parsed = JSON.parse(fileContent);
+
+      if (!parsed || typeof parsed !== 'object') {
+        addToast('Fichier JSON invalide.', 'error');
+        return false;
+      }
+
+      const importedApps = Array.isArray(parsed.applications)
+        ? parsed.applications
+        : Array.isArray(parsed)
+        ? parsed
+        : null;
+      const importedProfile =
+        parsed.userProfile && typeof parsed.userProfile === 'object' ? parsed.userProfile : null;
+
+      if (!importedApps && !importedProfile) {
+        addToast('Aucune donnée valide trouvée dans le fichier de sauvegarde.', 'error');
+        return false;
+      }
+
+      if (importedApps) {
+        setApplications(importedApps);
+        localStorage.setItem(STORAGE_KEY_APPS, JSON.stringify(importedApps));
+      }
+
+      if (importedProfile) {
+        setUserProfile(importedProfile);
+        localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(importedProfile));
+      }
+
+      if (Array.isArray(parsed.readNotifications)) {
+        localStorage.setItem('candidly_read_notifs', JSON.stringify(parsed.readNotifications));
+      }
+
+      addToast(
+        `Sauvegarde importée avec succès (${importedApps ? importedApps.length : 0} candidatures restaurées) !`,
+        'success'
+      );
+      return true;
+    } catch (e) {
+      console.error(e);
+      addToast(
+        'Format de fichier incorrect. Veuillez importer un fichier JSON de sauvegarde Candidly.',
+        'error'
+      );
+      return false;
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -371,6 +452,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         updateUserProfile,
         resetToDemoData,
         clearAllApplications,
+        exportData,
+        importData,
         toasts,
         addToast,
         removeToast,

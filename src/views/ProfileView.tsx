@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   User,
   Mail,
@@ -15,13 +15,33 @@ import {
   Globe,
   Tag,
   Save,
+  Download,
+  Upload,
+  Smartphone,
+  Laptop,
+  RefreshCw,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Domain, ContractType } from '../types';
 import { DOMAINS, CONTRACT_TYPES } from '../data/initialData';
 
 export const ProfileView: React.FC = () => {
-  const { userProfile, updateUserProfile } = useApp();
+  const { userProfile, updateUserProfile, exportData, importData } = useApp();
+  const profileFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleProfileFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const content = evt.target?.result as string;
+      if (content) {
+        importData(content);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState(userProfile.firstName);
@@ -446,6 +466,87 @@ export const ProfileView: React.FC = () => {
             </div>
           )}
         </form>
+      </div>
+
+      {/* Transfer & Backup Card (Téléphone ↔ Ordinateur) */}
+      <div className="rounded-2xl border border-teal-200 bg-gradient-to-br from-white to-[#F4F8F9] p-6 shadow-sm dark:border-slate-800 dark:from-slate-900 dark:to-slate-900/90">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300">
+              <RefreshCw className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>Transfert et Sauvegarde des données</span>
+                <span className="rounded-md bg-teal-100 px-2 py-0.5 text-[10px] font-semibold text-teal-800 dark:bg-teal-950 dark:text-teal-300">
+                  Téléphone ↔ Ordinateur
+                </span>
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Sauvegardez vos candidatures et votre profil pour continuer votre suivi sur un autre appareil ou navigateur.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="file"
+              ref={profileFileInputRef}
+              onChange={handleProfileFileChange}
+              accept=".json"
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={exportData}
+              className="flex items-center gap-1.5 rounded-xl bg-[#185868] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#124552] transition-colors"
+            >
+              <Download className="h-4 w-4" />
+              <span>Exporter ma sauvegarde (.json)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => profileFileInputRef.current?.click()}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-[#F4F8F9] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors"
+            >
+              <Upload className="h-4 w-4 text-teal-600" />
+              <span>Importer un fichier (.json)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 3 Step Guide */}
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="rounded-xl border border-slate-100 bg-white p-3 dark:border-slate-800 dark:bg-slate-800/50">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">
+              <Laptop className="h-4 w-4 text-teal-600" />
+              <span>1. Étape 1 : Exportation</span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              Sur votre premier appareil (ex: PC), cliquez sur <strong>Exporter ma sauvegarde</strong>. Un fichier <code>.json</code> est téléchargé.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-slate-100 bg-white p-3 dark:border-slate-800 dark:bg-slate-800/50">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">
+              <RefreshCw className="h-4 w-4 text-teal-600" />
+              <span>2. Étape 2 : Envoi</span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              Envoyez-vous le fichier par mail, WhatsApp, AirDrop, Google Drive ou USB vers votre smartphone/PC.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-slate-100 bg-white p-3 dark:border-slate-800 dark:bg-slate-800/50">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">
+              <Smartphone className="h-4 w-4 text-teal-600" />
+              <span>3. Étape 3 : Importation</span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              Sur votre second appareil (ex: Mobile), cliquez sur <strong>Importer un fichier</strong> et sélectionnez le fichier JSON. Vos données sont synchronisées !
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

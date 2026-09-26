@@ -382,7 +382,7 @@ export const ApplicationsView: React.FC = () => {
                 className="flex items-center gap-1.5 rounded-xl bg-teal-700 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-teal-800"
               >
                 <Plus className="h-4 w-4" />
-                <span>+ Ajouter ma première candidature</span>
+                <span>Ajouter ma première candidature</span>
               </button>
             )}
           </div>

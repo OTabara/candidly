@@ -12,6 +12,8 @@ import {
   Clock,
   Calendar,
   X,
+  Download,
+  Upload,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
@@ -32,10 +34,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
     setSelectedApplicationId,
     updateApplication,
     addToast,
+    exportData,
+    importData,
   } = useApp();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const content = evt.target?.result as string;
+      if (content) {
+        importData(content);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
   // Track read notification keys in localStorage
   const [readNotifKeys, setReadNotifKeys] = useState<string[]>(() => {
@@ -146,6 +165,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
 
       {/* Right Actions */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Hidden File Input for Import */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept=".json"
+          className="hidden"
+        />
+
         {/* Clear Demo Button */}
         <button
           type="button"
@@ -164,6 +192,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
         >
           <RotateCcw className="h-3.5 w-3.5" />
           <span>Vider la démo</span>
+        </button>
+
+        {/* Export / Import Data Buttons */}
+        <button
+          type="button"
+          onClick={exportData}
+          title="Sauvegarder mes données dans un fichier JSON pour passer d'un appareil à l'autre"
+          className="hidden lg:flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-800 transition-colors hover:bg-teal-100 dark:border-teal-900 dark:bg-teal-950/60 dark:text-teal-300"
+        >
+          <Download className="h-3.5 w-3.5" />
+          <span>Sauvegarder</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          title="Importer un fichier de sauvegarde JSON pour restaurer vos candidatures"
+          className="hidden lg:flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-[#F4F8F9] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+        >
+          <Upload className="h-3.5 w-3.5" />
+          <span>Importer</span>
         </button>
 
         {/* Bell Notifications Dropdown */}
