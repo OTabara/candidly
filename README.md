@@ -115,7 +115,7 @@ Conçu comme un projet personnel, Candidly réunit une interface utilisateur ré
 
 1. **Cloner le projet** :
    ```bash
-   git clone https://github.com/votre-compte/candidly.git
+   git clone https://github.com/OTabara/candidly.git
    cd candidly
    ```
 
