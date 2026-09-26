@@ -271,29 +271,15 @@ export const ApplicationModal: React.FC = () => {
               {/* Domaine */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Domaine
+                  Domaine / Secteur
                 </label>
-                <select
+                <input
+                  type="text"
                   value={domain}
-                  onChange={(e) => setDomain(e.target.value as Domain)}
+                  onChange={(e) => setDomain(e.target.value)}
+                  placeholder="Ex: Data, Informatique, Marketing, Finance..."
                   className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600 dark:border-slate-700 dark:bg-slate-800/80 dark:text-white"
-                >
-                  {DOMAINS.map((dom) => (
-                    <option key={dom} value={dom}>
-                      {dom}
-                    </option>
-                  ))}
-                </select>
-
-                {domain === 'Autre' && (
-                  <input
-                    type="text"
-                    value={customDomainInput}
-                    onChange={(e) => setCustomDomainInput(e.target.value)}
-                    placeholder="Préciser (ex: Cybersécurité...)"
-                    className="mt-2 w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                  />
-                )}
+                />
               </div>
 
               {/* Localisation */}

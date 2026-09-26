@@ -86,15 +86,7 @@ export const STATUS_CONFIG: Record<
   },
 };
 
-export const DOMAINS: Domain[] = [
-  'Data',
-  'Business Intelligence',
-  'Développement',
-  'IA',
-  'DevOps',
-  'Consulting / AMOA',
-  'Autre',
-];
+export const DOMAINS: Domain[] = [];
 
 export const CONTRACT_TYPES: ContractType[] = [
   'Stage',

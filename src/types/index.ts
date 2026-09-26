@@ -10,14 +10,7 @@ export type ApplicationStatus =
 
 export type ContractType = 'Stage' | 'Alternance' | 'CDI' | 'CDD' | 'Autre';
 
-export type Domain =
-  | 'Data'
-  | 'Business Intelligence'
-  | 'Développement'
-  | 'IA'
-  | 'DevOps'
-  | 'Consulting / AMOA'
-  | 'Autre';
+export type Domain = string;
 
 export interface Interview {
   id: string;

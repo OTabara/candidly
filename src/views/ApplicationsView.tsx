@@ -45,13 +45,21 @@ export const ApplicationsView: React.FC = () => {
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [showFiltersModal, setShowFiltersModal] = useState(false);
 
-  // Extract unique locations from applications for quick select
+  // Extract unique locations and domains from applications for quick select
   const locations = useMemo(() => {
     const locSet = new Set<string>();
     applications.forEach((a) => {
       if (a.location) locSet.add(a.location);
     });
     return Array.from(locSet);
+  }, [applications]);
+
+  const availableDomains = useMemo(() => {
+    const domSet = new Set<string>();
+    applications.forEach((a) => {
+      if (a.domain) domSet.add(a.domain);
+    });
+    return Array.from(domSet);
   }, [applications]);
 
   // Filtering & Sorting logic
@@ -278,7 +286,7 @@ export const ApplicationsView: React.FC = () => {
               className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs focus:ring-2 focus:ring-teal-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
             >
               <option value="ALL">Tous les domaines</option>
-              {DOMAINS.map((dom) => (
+              {availableDomains.map((dom) => (
                 <option key={dom} value={dom}>
                   {dom}
                 </option>

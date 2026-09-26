@@ -108,12 +108,8 @@ export const ProfileView: React.FC = () => {
     setSkills(skills.filter((s) => s !== skillToRemove));
   };
 
-  const toggleTargetDomain = (dom: string) => {
-    if (targetDomains.includes(dom)) {
-      setTargetDomains(targetDomains.filter((d) => d !== dom));
-    } else {
-      setTargetDomains([...targetDomains, dom]);
-    }
+  const handleRemoveDomain = (domToRemove: string) => {
+    setTargetDomains(targetDomains.filter((d) => d !== domToRemove));
   };
 
   const handleAddCustomDomain = (e: React.FormEvent) => {
@@ -515,44 +511,53 @@ export const ProfileView: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-3 border-t border-slate-100 dark:border-slate-800">
             {/* Domaines */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                Domaines recherchés
-              </label>
-              <div className="flex flex-wrap gap-1.5">
-                {Array.from(new Set([...DOMAINS, ...targetDomains])).map((dom) => {
-                  const selected = targetDomains.includes(dom);
-                  return (
-                    <button
-                      type="button"
-                      key={dom}
-                      disabled={!isEditing}
-                      onClick={() => toggleTargetDomain(dom)}
-                      className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors ${
-                        selected
-                          ? 'bg-[#185868] text-white'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
-                      }`}
-                    >
-                      {dom}
-                    </button>
-                  );
-                })}
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Domaines / Secteurs recherchés
+                </label>
               </div>
 
-              {/* Champ d'ajout d'un domaine personnalisé */}
+              {/* List of user domain tags */}
+              <div className="flex flex-wrap gap-2">
+                {targetDomains.length > 0 ? (
+                  targetDomains.map((dom) => (
+                    <span
+                      key={dom}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-[#E6F0F2] border border-[#D5E3E7] px-3 py-1 text-xs font-semibold text-[#185868] dark:bg-cyan-950/60 dark:border-cyan-950/60 dark:text-teal-400"
+                    >
+                      <span>{dom}</span>
+                      {isEditing && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDomain(dom)}
+                          className="text-[#185868] hover:text-rose-600 dark:text-teal-400 dark:hover:text-rose-400"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400 italic">
+                    Aucun domaine spécifique renseigné. Cliquez sur modifier pour en ajouter.
+                  </p>
+                )}
+              </div>
+
+              {/* Champ d'ajout d'un domaine libre */}
               {isEditing && (
                 <div className="mt-3 flex gap-2">
                   <input
                     type="text"
                     value={newCustomDomain}
                     onChange={(e) => setNewCustomDomain(e.target.value)}
-                    placeholder="Saisir un domaine sur mesure (ex: Cybersécurité)..."
+                    placeholder="Saisir un domaine (ex: Cybersécurité, Data, Finance...)"
                     className="flex-1 rounded-lg border border-slate-300 px-3 py-1 text-xs dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                   />
                   <button
                     type="button"
                     onClick={handleAddCustomDomain}
-                    className="rounded-lg border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800 hover:bg-teal-100 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-300"
+                    className="rounded-lg bg-[#185868] px-3.5 py-1 text-xs font-bold text-white hover:bg-[#124552] transition-colors"
                   >
                     + Domaine
                   </button>
