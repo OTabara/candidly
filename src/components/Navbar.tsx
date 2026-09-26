@@ -29,6 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
     setIsAddModalOpen,
     setEditingApplication,
     clearAllApplications,
+    activeTab,
     setActiveTab,
     applications,
     setSelectedApplicationId,
@@ -174,7 +175,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
           className="hidden"
         />
 
-        {/* Clear Demo Button */}
+        {/* Clear Demo Button - Visible on Mobile & Desktop */}
         <button
           type="button"
           onClick={() => {
@@ -188,10 +189,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
             }
           }}
           title="Réinitialiser l'espace et commencer mon vrai suivi"
-          className="hidden md:flex items-center gap-1.5 rounded-full border border-[#D5E3E7] bg-[#E6F0F2] px-3 py-1.5 text-xs font-semibold text-[#185868] transition-colors hover:bg-[#D4E5E9] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+          className="flex items-center gap-1 sm:gap-1.5 rounded-full border border-[#D5E3E7] bg-[#E6F0F2] px-2.5 py-1 sm:px-3 sm:py-1.5 text-xs font-semibold text-[#185868] transition-colors hover:bg-[#D4E5E9] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 shrink-0"
         >
-          <RotateCcw className="h-3.5 w-3.5" />
-          <span>Vider la démo</span>
+          <RotateCcw className="h-3.5 w-3.5 shrink-0" />
+          <span className="hidden xs:inline sm:inline">Vider la démo</span>
+          <span className="xs:hidden sm:hidden">Vider</span>
         </button>
 
         {/* Export / Import Data Buttons */}
@@ -366,23 +368,28 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
         </button>
 
         {/* User Avatar & Profile Quick Link */}
-        <div
+        <button
+          type="button"
           onClick={() => setActiveTab('profile')}
-          className="flex cursor-pointer items-center gap-2.5 rounded-full p-1 pl-2 hover:bg-[#F4F8F9] dark:hover:bg-slate-800 transition-colors"
+          title="Accéder à mon Profil et CV"
+          className={`flex cursor-pointer items-center gap-2 rounded-full p-1 transition-all ${
+            activeTab === 'profile'
+              ? 'ring-2 ring-[#185868] bg-[#E6F0F2] dark:bg-slate-800'
+              : 'hover:bg-[#F4F8F9] dark:hover:bg-slate-800'
+          }`}
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#34495E] text-xs font-bold text-white shadow-xs">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#185868] text-xs font-black text-white shadow-xs">
             {userProfile.firstName.charAt(0)}
           </div>
-          <div className="hidden text-left sm:block">
+          <div className="hidden text-left sm:block pr-1">
             <p className="text-xs font-bold leading-tight text-slate-800 dark:text-slate-200">
               {userProfile.firstName}
             </p>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
-              {userProfile.specialization || 'Candidat'}
+            <p className="text-[10px] font-semibold text-teal-700 dark:text-teal-400 truncate max-w-[120px]">
+              Profil et CV
             </p>
           </div>
-          <ChevronDown className="h-3.5 w-3.5 text-slate-400 hidden sm:block" />
-        </div>
+        </button>
       </div>
     </header>
   );

@@ -10,6 +10,7 @@ import {
   Code2,
   X,
   GraduationCap,
+  RotateCcw,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ViewTab } from '../types';
@@ -20,7 +21,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile }) => {
-  const { activeTab, setActiveTab, applications } = useApp();
+  const { activeTab, setActiveTab, applications, clearAllApplications, setEditingApplication } = useApp();
 
   const navItems: { id: ViewTab; label: string; icon: React.ElementType; badge?: string | number; isNew?: boolean }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -171,7 +172,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile })
           })}
         </nav>
 
-        {/* Bottom Botanical Artwork & Quote (Matching the reference image) */}
+        {/* Action Vider les données démo */}
+        <div className="px-3 py-2 border-t border-[#D5E3E7] dark:border-slate-800">
+          <button
+            type="button"
+            onClick={() => {
+              if (
+                window.confirm(
+                  'Voulez-vous vider les candidatures de démonstration et commencer votre vrai suivi ?'
+                )
+              ) {
+                clearAllApplications();
+                setEditingApplication(null);
+                onCloseMobile();
+              }
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-xs font-bold text-teal-800 hover:bg-teal-100 dark:border-teal-950 dark:bg-teal-950/40 dark:text-teal-300 transition-colors"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span>Vider la démo</span>
+          </button>
+        </div>
+
+        {/* Bottom Botanical Artwork & Quote */}
         <div className="p-4 pt-2 border-t border-[#D5E3E7] dark:border-slate-800/80">
           <div className="relative overflow-hidden rounded-xl bg-gradient-to-b from-[#DCEDF0] to-[#CFE4E8] p-3.5 text-center text-[#185868] dark:from-slate-800 dark:to-slate-800/60 dark:text-slate-200">
             {/* Soft decorative botanical leaf SVG */}
