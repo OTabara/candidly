@@ -20,14 +20,18 @@ import {
   Smartphone,
   Laptop,
   RefreshCw,
+  Eye,
+  Printer,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Domain, ContractType } from '../types';
 import { DOMAINS, CONTRACT_TYPES } from '../data/initialData';
 
 export const ProfileView: React.FC = () => {
-  const { userProfile, updateUserProfile, exportData, importData } = useApp();
+  const { userProfile, updateUserProfile, exportData, importData, addToast } = useApp();
   const profileFileInputRef = useRef<HTMLInputElement>(null);
+  const cvUploadInputRef = useRef<HTMLInputElement>(null);
+  const [isCvModalOpen, setIsCvModalOpen] = useState(false);
 
   const handleProfileFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,7 +56,13 @@ export const ProfileView: React.FC = () => {
   const [education, setEducation] = useState(userProfile.education);
   const [specialization, setSpecialization] = useState(userProfile.specialization);
   const [bio, setBio] = useState(userProfile.bio);
+  
+  // CV Upload States
   const [primaryResume, setPrimaryResume] = useState(userProfile.primaryResume);
+  const [primaryResumeDataUrl, setPrimaryResumeDataUrl] = useState(userProfile.primaryResumeDataUrl || '');
+  const [primaryResumeSize, setPrimaryResumeSize] = useState(userProfile.primaryResumeSize || '245 KB');
+  const [primaryResumeUpdatedAt, setPrimaryResumeUpdatedAt] = useState(userProfile.primaryResumeUpdatedAt || '26/09/2026');
+
   const [linkedinUrl, setLinkedinUrl] = useState(userProfile.linkedinUrl);
   const [githubUrl, setGithubUrl] = useState(userProfile.githubUrl);
   const [portfolioUrl, setPortfolioUrl] = useState(userProfile.portfolioUrl || '');
@@ -60,8 +70,30 @@ export const ProfileView: React.FC = () => {
   const [skills, setSkills] = useState<string[]>(userProfile.skills);
   const [newSkill, setNewSkill] = useState('');
 
-  const [targetDomains, setTargetDomains] = useState<Domain[]>(userProfile.targetDomains);
-  const [targetContracts, setTargetContracts] = useState<ContractType[]>(userProfile.targetContracts);
+  const [targetDomains, setTargetDomains] = useState<string[]>(userProfile.targetDomains || []);
+  const [newCustomDomain, setNewCustomDomain] = useState('');
+  
+  const [targetContracts, setTargetContracts] = useState<string[]>(userProfile.targetContracts || []);
+  const [customContract, setCustomContract] = useState(userProfile.customContract || '');
+
+  const handleCvUploadFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const sizeKb = (file.size / 1024).toFixed(0) + ' KB';
+    const dateStr = new Date().toLocaleDateString('fr-FR');
+    setPrimaryResume(file.name);
+    setPrimaryResumeSize(sizeKb);
+    setPrimaryResumeUpdatedAt(dateStr);
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const dataUrl = evt.target?.result as string;
+      setPrimaryResumeDataUrl(dataUrl);
+      addToast(`CV "${file.name}" téléversé avec succès !`, 'success');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const handleAddSkill = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +108,7 @@ export const ProfileView: React.FC = () => {
     setSkills(skills.filter((s) => s !== skillToRemove));
   };
 
-  const toggleTargetDomain = (dom: Domain) => {
+  const toggleTargetDomain = (dom: string) => {
     if (targetDomains.includes(dom)) {
       setTargetDomains(targetDomains.filter((d) => d !== dom));
     } else {
@@ -84,7 +116,17 @@ export const ProfileView: React.FC = () => {
     }
   };
 
-  const toggleTargetContract = (c: ContractType) => {
+  const handleAddCustomDomain = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCustomDomain.trim()) return;
+    const trimmed = newCustomDomain.trim();
+    if (!targetDomains.includes(trimmed)) {
+      setTargetDomains([...targetDomains, trimmed]);
+    }
+    setNewCustomDomain('');
+  };
+
+  const toggleTargetContract = (c: string) => {
     if (targetContracts.includes(c)) {
       setTargetContracts(targetContracts.filter((ct) => ct !== c));
     } else {
@@ -104,12 +146,16 @@ export const ProfileView: React.FC = () => {
       specialization,
       bio,
       primaryResume,
+      primaryResumeDataUrl,
+      primaryResumeSize,
+      primaryResumeUpdatedAt,
       linkedinUrl,
       githubUrl,
       portfolioUrl,
       skills,
       targetDomains,
       targetContracts,
+      customContract: targetContracts.includes('Autre') ? customContract : '',
     });
     setIsEditing(false);
   };
@@ -160,43 +206,87 @@ export const ProfileView: React.FC = () => {
               {lastName.charAt(0)}
             </div>
 
-            <div className="flex-1 space-y-1">
+            <div className="flex-1 space-y-2">
               {isEditing ? (
-                <div className="grid grid-cols-2 gap-3 max-w-md">
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Prénom"
-                    className="rounded-lg border border-slate-300 p-2 text-xs font-semibold dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                  />
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Nom"
-                    className="rounded-lg border border-slate-300 p-2 text-xs font-semibold dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                  />
+                <div className="space-y-3 max-w-lg">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Prénom</label>
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Prénom"
+                        className="w-full rounded-lg border border-slate-300 p-2 text-xs font-semibold dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Nom</label>
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Nom"
+                        className="w-full rounded-lg border border-slate-300 p-2 text-xs font-semibold dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Spécialisation / Intitulé</label>
+                      <input
+                        type="text"
+                        value={specialization}
+                        onChange={(e) => setSpecialization(e.target.value)}
+                        placeholder="Ex: Ingénierie & Gestion de Projets Web..."
+                        className="w-full rounded-lg border border-slate-300 p-2 text-xs font-semibold dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Diplôme / Formation</label>
+                      <input
+                        type="text"
+                        value={education}
+                        onChange={(e) => setEducation(e.target.value)}
+                        placeholder="Ex: Master Informatique, Diplôme Ingénieur..."
+                        className="w-full rounded-lg border border-slate-300 p-2 text-xs font-semibold dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">Ville / Localisation</label>
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="Ex: Paris, Toulouse, Remote..."
+                      className="w-full rounded-lg border border-slate-300 p-2 text-xs font-semibold dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                    />
+                  </div>
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-extrabold text-[#185868] dark:text-white">
-                    {firstName} {lastName}
-                  </h2>
-                  <span className="rounded-full bg-[#E6F0F2] px-2.5 py-0.5 text-xs font-bold text-[#185868] dark:bg-cyan-950 dark:text-teal-400">
-                    Candidat(e)
-                  </span>
-                </div>
-              )}
+                <>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-extrabold text-[#185868] dark:text-white">
+                      {firstName} {lastName}
+                    </h2>
+                    <span className="rounded-full bg-[#E6F0F2] px-2.5 py-0.5 text-xs font-bold text-[#185868] dark:bg-cyan-950 dark:text-teal-400">
+                      Candidat(e)
+                    </span>
+                  </div>
 
-              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                <GraduationCap className="h-4 w-4 text-[#185868]" />
-                {specialization} • {education}
-              </p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                {city}
-              </p>
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <GraduationCap className="h-4 w-4 text-[#185868]" />
+                    {specialization || 'Intitulé non précisé'} • {education || 'Formation non précisée'}
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                    {city}
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
@@ -312,32 +402,64 @@ export const ProfileView: React.FC = () => {
             )}
           </div>
 
-          {/* CV Principal */}
+          {/* CV Principal avec Téléversement Réel */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              CV Principal Référencé
-            </label>
-            {isEditing ? (
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                CV Principal Référencé
+              </label>
               <input
-                type="text"
-                value={primaryResume}
-                onChange={(e) => setPrimaryResume(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 p-2 text-xs dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                type="file"
+                ref={cvUploadInputRef}
+                onChange={handleCvUploadFile}
+                accept=".pdf,.doc,.docx"
+                className="hidden"
               />
-            ) : (
-              <div className="flex items-center justify-between rounded-xl border border-[#E1ECEE] p-3 bg-[#F4F8F9] dark:border-slate-800 dark:bg-slate-800/50">
-                <div className="flex items-center gap-2.5 text-xs">
-                  <FileText className="h-5 w-5 text-[#185868] dark:text-teal-400" />
-                  <div>
-                    <p className="font-bold text-slate-900 dark:text-white">{primaryResume}</p>
-                    <p className="text-[11px] text-slate-400">PDF • Mis à jour pour la recherche 2026</p>
-                  </div>
+              <button
+                type="button"
+                onClick={() => cvUploadInputRef.current?.click()}
+                className="flex items-center gap-1.5 rounded-lg border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800 hover:bg-teal-100 dark:border-teal-900 dark:bg-teal-950/60 dark:text-teal-300 transition-colors"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                <span>Uploader mon CV (.pdf, .docx)</span>
+              </button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-[#E1ECEE] p-3.5 bg-[#F4F8F9] dark:border-slate-800 dark:bg-slate-800/50">
+              <div className="flex items-center gap-3 text-xs">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#185868] text-white shadow-xs">
+                  <FileText className="h-5 w-5" />
                 </div>
-                <span className="rounded-md bg-[#E6F0F2] px-2.5 py-0.5 text-[10px] font-bold text-[#185868] dark:bg-teal-950 dark:text-teal-300">
-                  Actif
-                </span>
+                <div>
+                  <p className="font-bold text-slate-900 dark:text-white">{primaryResume}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {primaryResumeSize} • Mis à jour le {primaryResumeUpdatedAt}
+                  </p>
+                </div>
               </div>
-            )}
+
+              <div className="flex flex-wrap items-center gap-2 self-end sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsCvModalOpen(true)}
+                  className="flex items-center gap-1.5 rounded-lg border border-[#185868] bg-[#185868] px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#124552] transition-colors"
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                  <span>Apercevoir mon CV</span>
+                </button>
+
+                {primaryResumeDataUrl && (
+                  <a
+                    href={primaryResumeDataUrl}
+                    download={primaryResume}
+                    className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 transition-colors"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    <span>Télécharger</span>
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Compétences (Skills Tags) */}
@@ -390,14 +512,14 @@ export const ProfileView: React.FC = () => {
           </div>
 
           {/* Domaines et Contrats ciblés */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-3 border-t border-slate-100 dark:border-slate-800">
             {/* Domaines */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
                 Domaines recherchés
               </label>
               <div className="flex flex-wrap gap-1.5">
-                {DOMAINS.map((dom) => {
+                {Array.from(new Set([...DOMAINS, ...targetDomains])).map((dom) => {
                   const selected = targetDomains.includes(dom);
                   return (
                     <button
@@ -416,6 +538,26 @@ export const ProfileView: React.FC = () => {
                   );
                 })}
               </div>
+
+              {/* Champ d'ajout d'un domaine personnalisé */}
+              {isEditing && (
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="text"
+                    value={newCustomDomain}
+                    onChange={(e) => setNewCustomDomain(e.target.value)}
+                    placeholder="Saisir un domaine sur mesure (ex: Cybersécurité)..."
+                    className="flex-1 rounded-lg border border-slate-300 px-3 py-1 text-xs dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomDomain}
+                    className="rounded-lg border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800 hover:bg-teal-100 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-300"
+                  >
+                    + Domaine
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Contrats */}
@@ -443,6 +585,28 @@ export const ProfileView: React.FC = () => {
                   );
                 })}
               </div>
+
+              {/* Champ personnalisé si 'Autre' est sélectionné */}
+              {targetContracts.includes('Autre') && (
+                <div className="mt-3">
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    Préciser le contrat personnalisé :
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={customContract}
+                      onChange={(e) => setCustomContract(e.target.value)}
+                      placeholder="Ex: Freelance, VIE, Prestation ESN, Graduate Program..."
+                      className="w-full rounded-xl border border-slate-300 p-2 text-xs font-medium dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                    />
+                  ) : (
+                    <p className="text-xs font-medium text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 p-2 rounded-lg border border-teal-200 dark:border-teal-900">
+                      Contrat spécifique : {customContract || 'Non précisé'}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -548,6 +712,152 @@ export const ProfileView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal d'Aperçu du CV Actif */}
+      {isCvModalOpen && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-6 bg-slate-900/70 backdrop-blur-md overflow-hidden">
+          <div className="relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl bg-white shadow-2xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 p-4 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#185868] text-white shadow-xs">
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span>Aperçu du CV : {primaryResume}</span>
+                    <span className="rounded-md bg-teal-100 px-2 py-0.5 text-[10px] font-bold text-teal-800 dark:bg-teal-950 dark:text-teal-300">
+                      CV Actif
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Mis à jour le {primaryResumeUpdatedAt} • Taille : {primaryResumeSize}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {primaryResumeDataUrl && (
+                  <a
+                    href={primaryResumeDataUrl}
+                    download={primaryResume}
+                    className="hidden sm:flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    <span>Télécharger</span>
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="hidden sm:flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                >
+                  <Printer className="h-3.5 w-3.5" />
+                  <span>Imprimer</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsCvModalOpen(false)}
+                  className="rounded-xl border border-slate-200 p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:border-slate-700 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body / Viewer */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-100 dark:bg-slate-950">
+              {primaryResumeDataUrl && (primaryResumeDataUrl.startsWith('data:application/pdf') || primaryResumeDataUrl.startsWith('data:image')) ? (
+                <iframe
+                  src={primaryResumeDataUrl}
+                  title="Aperçu du CV"
+                  className="w-full h-[72vh] rounded-xl border border-slate-200 dark:border-slate-800 bg-white shadow-sm"
+                />
+              ) : (
+                /* Standard Visual CV Preview Sheet formatted from user profile */
+                <div className="mx-auto max-w-2xl rounded-2xl bg-white p-8 shadow-md text-slate-800 dark:bg-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800 space-y-6 font-sans">
+                  {/* CV Header */}
+                  <div className="border-b border-slate-200 pb-5 dark:border-slate-800 flex justify-between items-start gap-4">
+                    <div>
+                      <h1 className="text-2xl font-black text-[#185868] dark:text-white tracking-tight">
+                        {firstName} {lastName}
+                      </h1>
+                      <p className="text-sm font-bold text-teal-700 dark:text-teal-400 mt-1">
+                        {specialization || 'Candidat(e)'}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        {education || 'Master Informatique & Management'}
+                      </p>
+                    </div>
+
+                    <div className="text-right text-xs space-y-1 text-slate-600 dark:text-slate-300 font-medium">
+                      <p className="flex items-center justify-end gap-1.5">
+                        <Mail className="h-3.5 w-3.5 text-[#185868]" />
+                        <span>{email}</span>
+                      </p>
+                      <p className="flex items-center justify-end gap-1.5">
+                        <Phone className="h-3.5 w-3.5 text-[#185868]" />
+                        <span>{phone}</span>
+                      </p>
+                      <p className="flex items-center justify-end gap-1.5">
+                        <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                        <span>{city}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Profile Summary */}
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#185868] dark:text-teal-400 mb-2">
+                      Profil & Synthèse Professionnelle
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800">
+                      {bio || 'Candidat expérimenté en recherche active de nouvelles opportunités.'}
+                    </p>
+                  </div>
+
+                  {/* Skills */}
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#185868] dark:text-teal-400 mb-2">
+                      Compétences Clés & Technologies
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {skills.map((s) => (
+                        <span key={s} className="rounded-lg bg-[#E6F0F2] px-3 py-1 text-xs font-semibold text-[#185868] dark:bg-teal-950 dark:text-teal-300">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Targeted Domains */}
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#185868] dark:text-teal-400 mb-2">
+                      Domaines & Contrats Recherchés
+                    </h4>
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      {targetDomains.map((d) => (
+                        <span key={d} className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 font-medium text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                          {d}
+                        </span>
+                      ))}
+                      {targetContracts.map((c) => (
+                        <span key={c} className="rounded-md border border-teal-200 bg-teal-50 px-2.5 py-1 font-bold text-teal-800 dark:border-teal-900 dark:bg-teal-950 dark:text-teal-300">
+                          {c === 'Autre' && customContract ? customContract : c}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-center text-[10px] text-slate-400">
+                    Fiche CV générée et référencée dans Candidly JobTracker • Fichier original : {primaryResume}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

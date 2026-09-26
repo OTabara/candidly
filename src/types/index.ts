@@ -76,9 +76,13 @@ export interface UserProfile {
   education: string;
   specialization: string;
   skills: string[];
-  targetDomains: Domain[];
-  targetContracts: ContractType[];
+  targetDomains: (Domain | string)[];
+  targetContracts: (ContractType | string)[];
+  customContract?: string;
   primaryResume: string;
+  primaryResumeDataUrl?: string;
+  primaryResumeSize?: string;
+  primaryResumeUpdatedAt?: string;
   linkedinUrl: string;
   githubUrl: string;
   portfolioUrl?: string;

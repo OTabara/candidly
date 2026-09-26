@@ -256,6 +256,16 @@ export const ApplicationModal: React.FC = () => {
                     </option>
                   ))}
                 </select>
+
+                {contractType === 'Autre' && (
+                  <input
+                    type="text"
+                    value={customContractInput}
+                    onChange={(e) => setCustomContractInput(e.target.value)}
+                    placeholder="Préciser (ex: Freelance, VIE...)"
+                    className="mt-2 w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                  />
+                )}
               </div>
 
               {/* Domaine */}
@@ -274,6 +284,16 @@ export const ApplicationModal: React.FC = () => {
                     </option>
                   ))}
                 </select>
+
+                {domain === 'Autre' && (
+                  <input
+                    type="text"
+                    value={customDomainInput}
+                    onChange={(e) => setCustomDomainInput(e.target.value)}
+                    placeholder="Préciser (ex: Cybersécurité...)"
+                    className="mt-2 w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                  />
+                )}
               </div>
 
               {/* Localisation */}
