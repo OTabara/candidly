@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  
+  body {
+    font-family: var(--font-sans);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
+
+
+/* JobTracker visual identity — pétrole, turquoise, glacier, sable, ivoire. */
+:root {
+  --jt-petrol: #185868;
+  --jt-petrol-dark: #124552;
+  --jt-petrol-light: #237082;
+  --jt-sidebar-bg: #E6F0F2;
+  --jt-app-bg: #F3F7F8;
+  --jt-card-border: #E1ECEE;
+  --jt-turquoise: #2A9D8F;
+  --jt-sand: #F4EFE6;
+  --jt-ivory: #FFFFFF;
+  --jt-anthracite: #1E293B;
+  --jt-muted: #52707D;
+}
+
+body {
+  background: var(--jt-app-bg);
+  color: var(--jt-anthracite);
+}
+
+::selection {
+  background: rgba(24, 88, 104, 0.2);
+}
+
