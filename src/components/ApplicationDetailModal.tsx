@@ -17,6 +17,7 @@ import {
   Plus,
   Send,
   Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ApplicationStatus } from '../types';
@@ -33,6 +34,7 @@ export const ApplicationDetailModal: React.FC = () => {
     updateStatus,
     addTimelineEvent,
     setActiveTab,
+    updateApplication,
   } = useApp();
 
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
@@ -58,6 +60,28 @@ export const ApplicationDetailModal: React.FC = () => {
 
   const handleStatusChange = (newStatus: ApplicationStatus) => {
     updateStatus(application.id, newStatus);
+  };
+
+  const handleSetFollowUpDate = (newDate: string) => {
+    if (!newDate) return;
+    updateApplication(application.id, { nextFollowUpDate: newDate });
+  };
+
+  const addDays = (numDays: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + numDays);
+    return d.toISOString().substring(0, 10);
+  };
+
+  const handleMarkFollowUpDone = () => {
+    const todayStr = new Date().toISOString().substring(0, 10);
+    addTimelineEvent(application.id, {
+      date: todayStr,
+      title: 'Relance effectuée',
+      description: `Relance envoyée le ${todayStr}.`,
+      type: 'NOTE',
+    });
+    updateApplication(application.id, { nextFollowUpDate: '' });
   };
 
   const handleAddTimeline = (e: React.FormEvent) => {
@@ -230,24 +254,101 @@ export const ApplicationDetailModal: React.FC = () => {
               </p>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-800/50">
-              <span className="flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                Prochaine relance
-              </span>
-              <p className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200">
-                {application.nextFollowUpDate ? application.nextFollowUpDate : 'Aucune date'}
-              </p>
+            <div className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-800/50 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                    <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                    Prochaine relance
+                  </span>
+                  {application.nextFollowUpDate && (
+                    <button
+                      type="button"
+                      onClick={() => updateApplication(application.id, { nextFollowUpDate: '' })}
+                      className="text-[10px] text-slate-400 hover:text-rose-500"
+                      title="Effacer la date"
+                    >
+                      Effacer
+                    </button>
+                  )}
+                </div>
+
+                {application.nextFollowUpDate ? (
+                  <p className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    {application.nextFollowUpDate}
+                  </p>
+                ) : (
+                  <div className="mt-1.5 space-y-1.5">
+                    <input
+                      type="date"
+                      onChange={(e) => handleSetFollowUpDate(e.target.value)}
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                    />
+                    <div className="flex items-center gap-1 text-[10px]">
+                      <span className="text-slate-400">Raccourci :</span>
+                      <button
+                        type="button"
+                        onClick={() => handleSetFollowUpDate(addDays(5))}
+                        className="rounded bg-amber-50 px-1.5 py-0.5 font-medium text-amber-700 hover:bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300"
+                      >
+                        +5j
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSetFollowUpDate(addDays(7))}
+                        className="rounded bg-amber-50 px-1.5 py-0.5 font-medium text-amber-700 hover:bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300"
+                      >
+                        +7j
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {application.nextFollowUpDate && (
+                <button
+                  type="button"
+                  onClick={handleMarkFollowUpDone}
+                  className="mt-2 flex items-center justify-center gap-1 rounded-lg bg-teal-50 px-2 py-1 text-[10px] font-bold text-teal-700 hover:bg-teal-100 dark:bg-cyan-950/60 dark:text-teal-300 dark:hover:bg-cyan-950 transition-colors"
+                  title="Enregistrer la relance dans l'historique et retirer le rappel"
+                >
+                  <CheckCircle2 className="h-3 w-3 shrink-0 text-teal-600" />
+                  <span>✓ Marquer comme faite</span>
+                </button>
+              )}
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-800/50">
-              <span className="flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                <Calendar className="h-3.5 w-3.5 text-purple-500 shrink-0" />
-                Date d'entretien
-              </span>
-              <p className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200">
-                {application.interviewDate ? application.interviewDate : 'Non planifié'}
-              </p>
+            <div className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-800/50 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                    <Calendar className="h-3.5 w-3.5 text-purple-500 shrink-0" />
+                    Date d'entretien
+                  </span>
+                  {application.interviewDate && (
+                    <button
+                      type="button"
+                      onClick={() => updateApplication(application.id, { interviewDate: '' })}
+                      className="text-[10px] text-slate-400 hover:text-rose-500"
+                      title="Effacer la date"
+                    >
+                      Effacer
+                    </button>
+                  )}
+                </div>
+
+                {application.interviewDate ? (
+                  <p className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    {application.interviewDate}
+                  </p>
+                ) : (
+                  <input
+                    type="date"
+                    onChange={(e) => updateApplication(application.id, { interviewDate: e.target.value })}
+                    className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                  />
+                )}
+              </div>
             </div>
           </div>
 
