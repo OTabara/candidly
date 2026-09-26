@@ -30,10 +30,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
     setActiveTab,
     applications,
     setSelectedApplicationId,
+    updateApplication,
+    addToast,
   } = useApp();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  // Track read notification keys in localStorage
+  const [readNotifKeys, setReadNotifKeys] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('candidly_read_notifs');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
 
   // Close notifications on click outside
   useEffect(() => {
@@ -52,6 +64,38 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
       !['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(app.status) &&
       (app.nextFollowUpDate || app.interviewDate)
   );
+
+  const getNotifKey = (app: typeof applications[0]) =>
+    `${app.id}-${app.nextFollowUpDate || ''}-${app.interviewDate || ''}`;
+
+  // Unread count
+  const unreadReminders = upcomingReminders.filter(
+    (app) => !readNotifKeys.includes(getNotifKey(app))
+  );
+
+  const markAllAsRead = () => {
+    const keys = upcomingReminders.map(getNotifKey);
+    setReadNotifKeys(keys);
+    try {
+      localStorage.setItem('candidly_read_notifs', JSON.stringify(keys));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleToggleNotifications = () => {
+    const nextState = !showNotifications;
+    setShowNotifications(nextState);
+    if (nextState) {
+      markAllAsRead();
+    }
+  };
+
+  const handleMarkFollowUpDone = (appId: string, company: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    updateApplication(appId, { nextFollowUpDate: '' });
+    addToast(`Relance marquée comme faite pour ${company} !`, 'success');
+  };
 
   const handleOpenAddModal = () => {
     setEditingApplication(null);
@@ -126,14 +170,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
         <div className="relative" ref={notifRef}>
           <button
             type="button"
-            onClick={() => setShowNotifications(!showNotifications)}
+            onClick={handleToggleNotifications}
             className="relative flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-[#F4F8F9] dark:text-slate-300 dark:hover:bg-slate-800"
             title="Notifications et relances"
           >
             <Bell className="h-4 w-4" />
-            {upcomingReminders.length > 0 && (
-              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
-                {upcomingReminders.length}
+            {unreadReminders.length > 0 && (
+              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-900 animate-pulse">
+                {unreadReminders.length}
               </span>
             )}
           </button>
@@ -145,16 +189,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
                 <div className="flex items-center gap-2">
                   <Bell className="h-4 w-4 text-teal-700 dark:text-teal-400" />
                   <h3 className="text-xs font-bold text-slate-900 dark:text-white">
-                    Rappels de relances et entretiens ({upcomingReminders.length})
+                    Rappels ({upcomingReminders.length})
                   </h3>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowNotifications(false)}
-                  className="rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {upcomingReminders.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={markAllAsRead}
+                      className="text-[11px] font-semibold text-teal-700 hover:underline dark:text-teal-400"
+                    >
+                      Tout marquer comme lu
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowNotifications(false)}
+                    className="rounded-lg p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
 
               <div className="mt-3 space-y-2.5 max-h-72 overflow-y-auto pr-1">
@@ -166,37 +221,51 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
                         setSelectedApplicationId(app.id);
                         setShowNotifications(false);
                       }}
-                      className="group flex items-start gap-3 rounded-xl border border-slate-100 bg-[#F4F8F9]/50 p-2.5 transition-colors hover:border-teal-400 hover:bg-white dark:border-slate-800 dark:bg-slate-800/40 dark:hover:bg-slate-800 cursor-pointer"
+                      className="group flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-[#F4F8F9]/50 p-2.5 transition-colors hover:border-teal-400 hover:bg-white dark:border-slate-800 dark:bg-slate-800/40 dark:hover:bg-slate-800 cursor-pointer"
                     >
-                      <div
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white shadow-xs ${app.logoBg || 'bg-teal-700'}`}
-                      >
-                        {app.logoLetter || app.company.charAt(0)}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-400 truncate">
-                            {app.company}
-                          </p>
-                          <span className="text-[10px] font-semibold text-slate-400">
-                            {app.jobTitle}
-                          </span>
+                      <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                        <div
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white shadow-xs ${app.logoBg || 'bg-teal-700'}`}
+                        >
+                          {app.logoLetter || app.company.charAt(0)}
                         </div>
-
-                        {app.nextFollowUpDate && (
-                          <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400">
-                            <Clock className="h-3 w-3 shrink-0" />
-                            <span>Relance prévue : {app.nextFollowUpDate}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-400 truncate">
+                              {app.company}
+                            </p>
+                            <span className="text-[10px] font-semibold text-slate-400 truncate ml-1">
+                              {app.jobTitle}
+                            </span>
                           </div>
-                        )}
 
-                        {app.interviewDate && (
-                          <div className="mt-0.5 flex items-center gap-1 text-[11px] font-medium text-purple-600 dark:text-purple-400">
-                            <Calendar className="h-3 w-3 shrink-0" />
-                            <span>Entretien : {app.interviewDate}</span>
-                          </div>
-                        )}
+                          {app.nextFollowUpDate && (
+                            <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                              <Clock className="h-3 w-3 shrink-0" />
+                              <span>Relance : {app.nextFollowUpDate}</span>
+                            </div>
+                          )}
+
+                          {app.interviewDate && (
+                            <div className="mt-0.5 flex items-center gap-1 text-[11px] font-medium text-purple-600 dark:text-purple-400">
+                              <Calendar className="h-3 w-3 shrink-0" />
+                              <span>Entretien : {app.interviewDate}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Quick Mark Done Button */}
+                      {app.nextFollowUpDate && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleMarkFollowUpDone(app.id, app.company, e)}
+                          title="Marquer la relance comme faite"
+                          className="shrink-0 rounded-lg border border-teal-200 bg-teal-50 px-2 py-1 text-[10px] font-bold text-teal-800 transition-colors hover:bg-teal-600 hover:text-white dark:border-teal-900 dark:bg-teal-950/60 dark:text-teal-300"
+                        >
+                          ✓ Faite
+                        </button>
+                      )}
                     </div>
                   ))
                 ) : (
