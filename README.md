@@ -1,8 +1,8 @@
-# Candidly — Système de Gestion de Candidatures & Carrière
+# Candidly — Système de Gestion de Candidatures et Carrière
 
 <div align="center">
   <br />
-  <p><b>Une plateforme élégante et complète de suivi de candidatures et de gestion de carrière, conçue avec React 19, TypeScript, Tailwind CSS v4 et une architecture Spring Boot 3 & PostgreSQL.</b></p>
+  <p><b>Une plateforme élégante et complète de suivi de candidatures et de gestion de carrière, conçue avec React 19, TypeScript, Tailwind CSS v4 et une architecture Spring Boot 3 et PostgreSQL.</b></p>
   <br />
   <img src="docs/screenshots/dashboard.png" alt="Aperçu du Tableau de Bord Candidly" width="100%" />
 </div>
@@ -12,16 +12,16 @@
 ## 📸 Aperçu de l'Interface
 
 <div align="center">
-  <p><b>Tableau de Bord & KPIs</b></p>
+  <p><b>Tableau de Bord et KPIs</b></p>
   <img src="docs/screenshots/dashboard.png" alt="Tableau de Bord Candidly" width="90%" />
   <br /><br />
   <p><b>Vue Kanban Glisser-Déposer</b></p>
   <img src="docs/screenshots/kanban.png" alt="Vue Kanban Candidly" width="90%" />
   <br /><br />
-  <p><b>Liste des Candidatures & Filtrage</b></p>
+  <p><b>Liste des Candidatures et Filtrage</b></p>
   <img src="docs/screenshots/applications.png" alt="Liste des Candidatures Candidly" width="90%" />
   <br /><br />
-  <p><b>Statistiques & Ratios de Conversion</b></p>
+  <p><b>Statistiques et Ratios de Conversion</b></p>
   <img src="docs/screenshots/statistics.png" alt="Statistiques Candidly" width="90%" />
 </div>
 
@@ -39,7 +39,7 @@ Conçu comme un projet personnel, Candidly réunit une interface utilisateur ré
 
 ### 1. Tableau de Bord (Executive Dashboard)
 - **Indicateurs KPI en Temps Réel** : Suivi des candidatures Totales, Envoyées, En attente, Entretiens, Offres reçues et Refus avec badges de progression hebdomadaire.
-- **Graphiques & Visualisations** :
+- **Graphiques et Visualisations** :
   - **Évolution sur 8 Semaines** : Graphique de tendance lissé illustrant le rythme cumulé des candidatures.
   - **Répartition par Statut** : Graphique en anneau (Donut chart) interactif du pipeline actuel.
   - **Répartition par Domaine** : Histogramme synthétique des orientations (Data, Business Intelligence, Développement, IA, DevOps).
@@ -47,27 +47,27 @@ Conçu comme un projet personnel, Candidly réunit une interface utilisateur ré
 
 ### 2. Tableau Kanban (Glisser-Déposer)
 - Colonnes de processus métier (*À contacter ➔ Candidature envoyée ➔ En attente ➔ Entretien ➔ Offre reçue ➔ Acceptée / Refusée*).
-- Fonctionnalité glisser-déposer (Drag & Drop) HTML5 avec mise à jour automatique des statuts et enregistrement dans la timeline.
+- Fonctionnalité glisser-déposer (Drag et Drop) HTML5 avec mise à jour automatique des statuts et enregistrement dans la timeline.
 - Boutons d'ajout rapide par colonne.
 
-### 3. Liste des Candidatures & Filtrage Avancé
+### 3. Liste des Candidatures et Filtrage Avancé
 - **Double Mode d'Affichage** : Basculez entre la vue en cartes et la vue tableau structurée.
-- **Recherche & Filtres Multicritères** : Filtrage par mot-clé (entreprise, poste, ville), statut, domaine, type de contrat (*Stage, Alternance, CDI, CDD*) et localisation.
+- **Recherche et Filtres Multicritères** : Filtrage par mot-clé (entreprise, poste, ville), statut, domaine, type de contrat (*Stage, Alternance, CDI, CDD*) et localisation.
 - **Exportation CSV / Excel en 1 clic** : Téléchargez vos données sous forme de fichier `.csv` structuré pour vos sauvegardes ou bilans académiques.
 
-### 4. Calendrier des Entretiens & Relances
+### 4. Calendrier des Entretiens et Relances
 - Calendrier mensuel interactif affichant les entretiens (RH/Techniques) et les dates de relances prévues.
 - Rappels automatiques des relances (conseillé à 5–7 jours ouvrés post-candidature).
 
-### 5. Statistiques & Ratios de Carrière
+### 5. Statistiques et Ratios de Carrière
 - Calcul des taux de transformation (*Ratio Candidature ➔ Entretien*, *Ratio Entretien ➔ Offre*).
 - Temps de réponse moyen et analyse de l'alignement par domaine professionnel.
 
-### 6. AI Job Match & Simulateur d'Entretien
+### 6. AI Job Match et Simulateur d'Entretien
 - Simulation d'analyse d'adéquation CV/Offre avec score de matching et rédaction de lettre de motivation ciblée.
 - Générateur de questions d'entretien préparatoires basées sur la fiche de poste.
 
-### 7. Code Source Backend (Spring Boot 3 & PostgreSQL)
+### 7. Code Source Backend (Spring Boot 3 et PostgreSQL)
 - Visualisation de l'architecture backend complète comprenant :
   - **`schema.sql`** : Script DDL PostgreSQL avec types ENUM, clés étrangères et index de performance.
   - **`Application.java`** : Classe d'entité ORM (Jakarta Persistence / JPA).
@@ -77,11 +77,11 @@ Conçu comme un projet personnel, Candidly réunit une interface utilisateur ré
 
 ---
 
-## Charte Graphique & Design System
+## Charte Graphique et Design System
 
 - **Couleur Principale** : Bleu Pétrole (`#185868`)
 - **Couleur d'Accent** : Turquoise (`#2A9D8F`)
-- **Fond Latéral & Badges** : Gris Glacier (`#E6F0F2`)
+- **Fond Latéral et Badges** : Gris Glacier (`#E6F0F2`)
 - **Fond de l'Application** : Blanc Glacier (`#F3F7F8`)
 - **Gestion des Thèmes** : Prise en charge des modes Clair et Sombre (Dark Mode).
 
@@ -98,14 +98,14 @@ Conçu comme un projet personnel, Candidly réunit une interface utilisateur ré
 
 ### Backend (Architecture de démonstration)
 - **Framework** : Java 21 / Spring Boot 3.3
-- **ORM & Données** : Spring Data JPA / Hibernate
+- **ORM et Données** : Spring Data JPA / Hibernate
 - **Base de Données** : PostgreSQL 16
 - **Sécurité** : Spring Security 6 + JJWT (JSON Web Token)
 - **Gestionnaire de Projet** : Maven
 
 ---
 
-## Installation & Lancement en Local
+## Installation et Lancement en Local
 
 ### Prérequis
 - [Node.js](https://nodejs.org/) (version 18.0.0 ou supérieure)
@@ -152,34 +152,34 @@ npm run preview
 
 ```
 candidly/
-├── index.html                    # Point d'entrée HTML & métadonnées
+├── index.html                    # Point d'entrée HTML et métadonnées
 ├── package.json                  # Scripts NPM et dépendances
 ├── vite.config.ts                # Configuration Vite
 ├── README.md                     # Documentation du projet
 ├── src/
 │   ├── main.tsx                  # Rendu DOM React
-│   ├── App.tsx                   # Layout principal & routeur de vues
-│   ├── index.css                 # Import Tailwind v4 & variables CSS
+│   ├── App.tsx                   # Layout principal et routeur de vues
+│   ├── index.css                 # Import Tailwind v4 et variables CSS
 │   ├── context/
-│   │   └── AppContext.tsx        # Gestion du stockage local & état global
+│   │   └── AppContext.tsx        # Gestion du stockage local et état global
 │   ├── components/
 │   │   ├── Navbar.tsx            # Barre supérieure (recherche, notifications, mode sombre)
 │   │   ├── Sidebar.tsx           # Menu latéral avec citation botanique
 │   │   ├── ApplicationModal.tsx  # Formulaire d'ajout / modification
 │   │   └── ToastContainer.tsx    # Système de notifications toast
 │   ├── data/
-│   │   └── initialData.ts        # Données de démonstration & constantes
+│   │   └── initialData.ts        # Données de démonstration et constantes
 │   ├── types/
-│   │   └── index.ts              # Interfaces & types TypeScript
+│   │   └── index.ts              # Interfaces et types TypeScript
 │   └── views/
-│       ├── DashboardView.tsx     # Tableau de bord principal (KPIs & graphiques)
-│       ├── ApplicationsView.tsx  # Liste des candidatures & export CSV
+│       ├── DashboardView.tsx     # Tableau de bord principal (KPIs et graphiques)
+│       ├── ApplicationsView.tsx  # Liste des candidatures et export CSV
 │       ├── KanbanView.tsx        # Tableau Kanban glisser-déposer
-│       ├── CalendarView.tsx      # Calendrier mensuel des entretiens & relances
-│       ├── StatisticsView.tsx    # Statistiques & ratios de conversion
-│       ├── ProfileView.tsx       # Profil étudiant & compétences
-│       ├── AiJobMatchView.tsx    # Simulateur IA de matching & préparation
-│       └── SpringBootCodeView.tsx# Code source backend Java Spring Boot & SQL
+│       ├── CalendarView.tsx      # Calendrier mensuel des entretiens et relances
+│       ├── StatisticsView.tsx    # Statistiques et ratios de conversion
+│       ├── ProfileView.tsx       # Profil étudiant et compétences
+│       ├── AiJobMatchView.tsx    # Simulateur IA de matching et préparation
+│       └── SpringBootCodeView.tsx# Code source backend Java Spring Boot et SQL
 ```
 
 ---
