@@ -4,7 +4,6 @@ import {
   Plus,
   Moon,
   Sun,
-  RotateCcw,
   Menu,
   Search,
   Bell,
@@ -165,7 +164,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
       </div>
 
       {/* Right Actions */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
         {/* Hidden File Input for Import */}
         <input
           type="file"
@@ -174,27 +173,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
           accept=".json"
           className="hidden"
         />
-
-        {/* Clear Demo Button - Visible on Mobile & Desktop */}
-        <button
-          type="button"
-          onClick={() => {
-            if (
-              window.confirm(
-                'Voulez-vous vider les candidatures de démonstration et commencer votre vrai suivi ?'
-              )
-            ) {
-              clearAllApplications();
-              setEditingApplication(null);
-            }
-          }}
-          title="Réinitialiser l'espace et commencer mon vrai suivi"
-          className="flex items-center gap-1 sm:gap-1.5 rounded-full border border-[#D5E3E7] bg-[#E6F0F2] px-2.5 py-1 sm:px-3 sm:py-1.5 text-xs font-semibold text-[#185868] transition-colors hover:bg-[#D4E5E9] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 shrink-0"
-        >
-          <RotateCcw className="h-3.5 w-3.5 shrink-0" />
-          <span className="hidden xs:inline sm:inline">Vider la démo</span>
-          <span className="xs:hidden sm:hidden">Vider</span>
-        </button>
 
         {/* Export / Import Data Buttons */}
         <button
