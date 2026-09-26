@@ -71,16 +71,27 @@ export const DashboardView: React.FC = () => {
       }));
   }, [applications]);
 
-  // Status breakdown calculated dynamically
+  // Status breakdown calculated dynamically with valid HEX colors for SVG
   const statusStats = React.useMemo(() => {
     const totalCount = applications.length;
+    const hexColors: Record<string, string> = {
+      A_CONTACTER: '#64748B', // Slate
+      ENVOYEE: '#0282AD',     // Petrol Blue
+      EN_ATTENTE: '#D97706',  // Amber
+      ENTRETIEN: '#8B5CF6',   // Purple
+      OFFRE_RECUE: '#2A9D8F', // Teal
+      ACCEPTEE: '#2E7D32',    // Emerald
+      REFUSEE: '#D9534F',     // Rose
+      ABANDONNEE: '#94A3B8',  // Slate
+    };
+
     const stats = [
-      { key: 'A_CONTACTER', label: 'À contacter', color: STATUS_CONFIG['A_CONTACTER']?.color || '#90A4AE', count: 0 },
-      { key: 'ENVOYEE', label: 'Envoyées', color: STATUS_CONFIG['ENVOYEE']?.color || '#2E8B9A', count: 0 },
-      { key: 'EN_ATTENTE', label: 'En attente', color: STATUS_CONFIG['EN_ATTENTE']?.color || '#E6A15C', count: 0 },
-      { key: 'ENTRETIEN', label: 'Entretiens', color: STATUS_CONFIG['ENTRETIEN']?.color || '#2A9D8F', count: 0 },
-      { key: 'REFUSEE', label: 'Refus', color: STATUS_CONFIG['REFUSEE']?.color || '#E57373', count: 0 },
-      { key: 'ACCEPTEE', label: 'Acceptées', color: STATUS_CONFIG['ACCEPTEE']?.color || '#4EAA78', count: 0 },
+      { key: 'A_CONTACTER', label: 'À contacter', color: hexColors.A_CONTACTER, count: 0 },
+      { key: 'ENVOYEE', label: 'Envoyées', color: hexColors.ENVOYEE, count: 0 },
+      { key: 'EN_ATTENTE', label: 'En attente', color: hexColors.EN_ATTENTE, count: 0 },
+      { key: 'ENTRETIEN', label: 'Entretiens', color: hexColors.ENTRETIEN, count: 0 },
+      { key: 'REFUSEE', label: 'Refus', color: hexColors.REFUSEE, count: 0 },
+      { key: 'ACCEPTEE', label: 'Acceptées', color: hexColors.ACCEPTEE, count: 0 },
     ];
 
     applications.forEach((app) => {
