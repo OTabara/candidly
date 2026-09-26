@@ -141,8 +141,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
             <p className="text-xs font-bold leading-tight text-slate-800 dark:text-slate-200">
               {userProfile.firstName}
             </p>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400">
-              M2 MIAGE - IPM
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[120px]">
+              {userProfile.specialization || 'Candidat'}
             </p>
           </div>
           <ChevronDown className="h-3.5 w-3.5 text-slate-400 hidden sm:block" />
