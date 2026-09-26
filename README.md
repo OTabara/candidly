@@ -10,9 +10,13 @@
 
 ## Présentation du Projet
 
-**Candidly** est une application web moderne de suivi de candidatures conçue pour les étudiants, jeunes diplômés et professionnels. Basée sur une charte graphique sur-mesure aux teintes **Bleu Pétrole (`#185868`)**, **Turquoise (`#2A9D8F`)** et **Gris Glacier (`#E6F0F2`)**, Candidly propose un workflow fluide pour organiser vos démarches de recrutement, planifier vos entretiens, programmer vos relances et analyser vos ratios de conversion.
-
-Développée dans le cadre du **Master 2 MIAGE — Ingénierie des Processus Métiers (IPM)**, Candidly réunit une interface utilisateur réactive (Single Page Application) et une vitrine complète d'architecture Backend (Java Spring Boot 3, Spring Security JWT et schéma PostgreSQL).
+13: **Candidly** est une application web moderne de suivi de candidatures conçue pour les candidats, alternants et professionnels. Basée sur une charte graphique sur-mesure aux teintes **Bleu Pétrole (`#185868`)**, **Turquoise (`#2A9D8F`)** et **Gris Glacier (`#E6F0F2`)**, Candidly propose un workflow fluide pour organiser vos démarches de recrutement, planifier vos entretiens, programmer vos relances et analyser vos ratios de conversion.
+14: 
+15: Conçu comme un projet personnel, Candidly réunit une interface utilisateur réactive (Single Page Application) et une vitrine complète d'architecture Backend (Java Spring Boot 3, Spring Security JWT et schéma PostgreSQL).
+...
+176: ## Contexte du Projet
+177: 
+178: Projet personnel développé pour offrir un outil moderne, élégant et performant de suivi de recherche d'emploi et de gestion de carrière.
 
 ---
 
@@ -173,9 +177,9 @@ Pour démarrer votre propre suivi avec un espace vierge, cliquez sur **"Vider la
 
 ---
 
-## Contexte Académique
+## Contexte du Projet
 
-Projet réalisé dans le cadre du cursus **Master 2 MIAGE — Ingénierie des Processus Métiers (IPM)**.
+Projet personnel développé pour offrir un outil moderne, élégant et performant de suivi de recherche d'emploi et de gestion de carrière.
 
 ---
 

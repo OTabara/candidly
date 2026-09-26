@@ -100,10 +100,10 @@ export const ProfileView: React.FC = () => {
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-xl font-extrabold tracking-tight text-[#185868] dark:text-white sm:text-2xl">
-            Profil Étudiant & CV
+            Profil Candidat & CV
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Gérez vos informations de candidature pour Master 2 MIAGE et le matching IA
+            Gérez vos informations de candidature et le matching IA
           </p>
         </div>
 
@@ -164,7 +164,7 @@ export const ProfileView: React.FC = () => {
                     {firstName} {lastName}
                   </h2>
                   <span className="rounded-full bg-[#E6F0F2] px-2.5 py-0.5 text-xs font-bold text-[#185868] dark:bg-cyan-950 dark:text-teal-400">
-                    Étudiante M2
+                    Candidat(e)
                   </span>
                 </div>
               )}
