@@ -99,6 +99,28 @@ export const DashboardView: React.FC = () => {
     }));
   }, [applications]);
 
+  // Dynamic donut segments
+  const donutSegments = React.useMemo(() => {
+    const totalCount = applications.length;
+    if (totalCount === 0) return [];
+    const C = 2 * Math.PI * 38; // ~238.761
+    let accumulatedOffset = 0;
+
+    return statusStats
+      .filter((s) => s.count > 0)
+      .map((s) => {
+        const segmentLength = (s.count / totalCount) * C;
+        const dashArray = `${segmentLength} ${C - segmentLength}`;
+        const dashOffset = -accumulatedOffset;
+        accumulatedOffset += segmentLength;
+        return {
+          ...s,
+          dashArray,
+          dashOffset,
+        };
+      });
+  }, [statusStats, applications.length]);
+
   // Specific "Prochaines actions" matching the reference screenshot
   const upcomingActions = [
     {
@@ -311,13 +333,21 @@ export const DashboardView: React.FC = () => {
 
                   {/* Area Fill */}
                   <path
-                    d="M 25,115 L 75,98 L 125,75 L 175,77 L 225,58 L 275,52 L 325,38 L 375,22 L 375,145 L 25,145 Z"
+                    d={
+                      total > 0
+                        ? "M 25,115 L 75,98 L 125,75 L 175,77 L 225,58 L 275,52 L 325,38 L 375,22 L 375,145 L 25,145 Z"
+                        : "M 25,145 L 375,145 L 375,145 L 25,145 Z"
+                    }
                     fill="url(#petrolGradient)"
                   />
 
                   {/* Trend Line */}
                   <path
-                    d="M 25,115 L 75,98 L 125,75 L 175,77 L 225,58 L 275,52 L 325,38 L 375,22"
+                    d={
+                      total > 0
+                        ? "M 25,115 L 75,98 L 125,75 L 175,77 L 225,58 L 275,52 L 325,38 L 375,22"
+                        : "M 25,145 L 75,145 L 125,145 L 175,145 L 225,145 L 275,145 L 325,145 L 375,145"
+                    }
                     fill="none"
                     stroke="#185868"
                     strokeWidth="2.5"
@@ -325,14 +355,14 @@ export const DashboardView: React.FC = () => {
                   />
 
                   {/* Line Dots */}
-                  <circle cx="25" cy="115" r="3.5" fill="#185868" />
-                  <circle cx="75" cy="98" r="3.5" fill="#185868" />
-                  <circle cx="125" cy="75" r="3.5" fill="#185868" />
-                  <circle cx="175" cy="77" r="3.5" fill="#185868" />
-                  <circle cx="225" cy="58" r="3.5" fill="#185868" />
-                  <circle cx="275" cy="52" r="3.5" fill="#185868" />
-                  <circle cx="325" cy="38" r="3.5" fill="#185868" />
-                  <circle cx="375" cy="22" r="4.5" fill="#2A9D8F" stroke="#FFFFFF" strokeWidth="2" />
+                  <circle cx="25" cy={total > 0 ? 115 : 145} r="3.5" fill="#185868" />
+                  <circle cx="75" cy={total > 0 ? 98 : 145} r="3.5" fill="#185868" />
+                  <circle cx="125" cy={total > 0 ? 75 : 145} r="3.5" fill="#185868" />
+                  <circle cx="175" cy={total > 0 ? 77 : 145} r="3.5" fill="#185868" />
+                  <circle cx="225" cy={total > 0 ? 58 : 145} r="3.5" fill="#185868" />
+                  <circle cx="275" cy={total > 0 ? 52 : 145} r="3.5" fill="#185868" />
+                  <circle cx="325" cy={total > 0 ? 38 : 145} r="3.5" fill="#185868" />
+                  <circle cx="375" cy={total > 0 ? 22 : 145} r="4.5" fill="#2A9D8F" stroke="#FFFFFF" strokeWidth="2" />
 
                   {/* X Axis Labels */}
                   <text x="22" y="158" fill="#94A3B8" fontSize="10">S1</text>
@@ -358,17 +388,32 @@ export const DashboardView: React.FC = () => {
                 <div className="relative h-36 w-36 shrink-0">
                   <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="38" fill="none" stroke="#E6F0F2" strokeWidth="14" className="dark:stroke-slate-800" />
-                    {/* Envoyées (50%) */}
-                    <circle cx="50" cy="50" r="38" fill="none" stroke="#2E8B9A" strokeWidth="14" strokeDasharray="119.38 119.38" strokeDashoffset="0" />
-                    {/* En attente (25%) */}
-                    <circle cx="50" cy="50" r="38" fill="none" stroke="#E6A15C" strokeWidth="14" strokeDasharray="59.69 179.07" strokeDashoffset="-119.38" />
-                    {/* Entretiens (17%) */}
-                    <circle cx="50" cy="50" r="38" fill="none" stroke="#2A9D8F" strokeWidth="14" strokeDasharray="40.58 198.18" strokeDashoffset="-179.07" />
-                    {/* Refus & Acceptées (8%) */}
-                    <circle cx="50" cy="50" r="38" fill="none" stroke="#E57373" strokeWidth="14" strokeDasharray="19.1 219.66" strokeDashoffset="-219.65" />
+                    {total > 0 && donutSegments.length > 0 ? (
+                      donutSegments.map((seg) => (
+                        <circle
+                          key={seg.key}
+                          cx="50"
+                          cy="50"
+                          r="38"
+                          fill="none"
+                          stroke={seg.color}
+                          strokeWidth="14"
+                          strokeDasharray={seg.dashArray}
+                          strokeDashoffset={seg.dashOffset}
+                          className="transition-all duration-500"
+                        />
+                      ))
+                    ) : total > 0 ? (
+                      <>
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="#2E8B9A" strokeWidth="14" strokeDasharray="119.38 119.38" strokeDashoffset="0" />
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="#E6A15C" strokeWidth="14" strokeDasharray="59.69 179.07" strokeDashoffset="-119.38" />
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="#2A9D8F" strokeWidth="14" strokeDasharray="40.58 198.18" strokeDashoffset="-179.07" />
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="#E57373" strokeWidth="14" strokeDasharray="19.1 219.66" strokeDashoffset="-219.65" />
+                      </>
+                    ) : null}
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span className="text-xl font-black text-slate-900 dark:text-white">{total > 0 ? total : 24}</span>
+                    <span className="text-xl font-black text-slate-900 dark:text-white">{total}</span>
                     <span className="text-[9px] text-slate-400">candidatures</span>
                   </div>
                 </div>
