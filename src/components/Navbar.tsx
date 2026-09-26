@@ -46,9 +46,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Compute upcoming follow-ups and interviews
+  // Compute upcoming follow-ups and interviews (excluding final statuses)
   const upcomingReminders = applications.filter(
-    (app) => app.nextFollowUpDate || app.interviewDate
+    (app) =>
+      !['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(app.status) &&
+      (app.nextFollowUpDate || app.interviewDate)
   );
 
   const handleOpenAddModal = () => {

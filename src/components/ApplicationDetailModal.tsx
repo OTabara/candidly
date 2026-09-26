@@ -261,7 +261,7 @@ export const ApplicationDetailModal: React.FC = () => {
                     <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                     Prochaine relance
                   </span>
-                  {application.nextFollowUpDate && (
+                  {application.nextFollowUpDate && !['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(application.status) && (
                     <button
                       type="button"
                       onClick={() => updateApplication(application.id, { nextFollowUpDate: '' })}
@@ -273,7 +273,13 @@ export const ApplicationDetailModal: React.FC = () => {
                   )}
                 </div>
 
-                {application.nextFollowUpDate ? (
+                {['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(application.status) ? (
+                  <div className="mt-1.5 rounded-lg bg-slate-100 dark:bg-slate-800/60 p-2 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    {application.status === 'ACCEPTEE' && '🎉 Offre acceptée (Aucune relance)'}
+                    {application.status === 'REFUSEE' && '❌ Candidature refusée'}
+                    {application.status === 'ABANDONNEE' && '⛔ Processus abandonné'}
+                  </div>
+                ) : application.nextFollowUpDate ? (
                   <p className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200">
                     {application.nextFollowUpDate}
                   </p>
@@ -305,7 +311,7 @@ export const ApplicationDetailModal: React.FC = () => {
                 )}
               </div>
 
-              {application.nextFollowUpDate && (
+              {application.nextFollowUpDate && !['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(application.status) && (
                 <button
                   type="button"
                   onClick={handleMarkFollowUpDone}

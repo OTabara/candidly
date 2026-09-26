@@ -79,8 +79,11 @@ export const CalendarView: React.FC = () => {
         });
       }
 
-      // Follow-up date
-      if (app.nextFollowUpDate) {
+      // Follow-up date (only for active applications)
+      if (
+        app.nextFollowUpDate &&
+        !['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(app.status)
+      ) {
         list.push({
           date: app.nextFollowUpDate,
           type: 'FOLLOW_UP',

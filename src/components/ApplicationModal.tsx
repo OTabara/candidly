@@ -347,11 +347,15 @@ export const ApplicationModal: React.FC = () => {
                   <Clock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                   <input
                     type="date"
-                    value={nextFollowUpDate}
+                    disabled={['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(status)}
+                    value={['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(status) ? '' : nextFollowUpDate}
                     onChange={(e) => setNextFollowUpDate(e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 pl-9 pr-3 py-2 text-xs focus:ring-2 focus:ring-teal-600 dark:border-slate-700 dark:bg-slate-800/80 dark:text-white"
+                    className="w-full rounded-xl border border-slate-300 pl-9 pr-3 py-2 text-xs focus:ring-2 focus:ring-teal-600 dark:border-slate-700 dark:bg-slate-800/80 dark:text-white disabled:opacity-50 disabled:bg-slate-100 dark:disabled:bg-slate-800"
                   />
                 </div>
+                {['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(status) && (
+                  <p className="mt-1 text-[11px] text-slate-400 italic">Non requise pour ce statut.</p>
+                )}
               </div>
 
               {/* Date d'entretien */}

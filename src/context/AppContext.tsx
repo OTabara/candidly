@@ -228,9 +228,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setApplications((prev) =>
       prev.map((app) => {
         if (app.id !== id) return app;
+
+        // If status changed to ACCEPTEE, REFUSEE, or ABANDONNEE, clear nextFollowUpDate
+        const isFinalStatus =
+          updates.status && ['ACCEPTEE', 'REFUSEE', 'ABANDONNEE'].includes(updates.status);
+
         const updated: JobApplication = {
           ...app,
           ...updates,
+          nextFollowUpDate: isFinalStatus ? '' : updates.nextFollowUpDate ?? app.nextFollowUpDate,
           updatedAt: new Date().toISOString(),
         };
 
@@ -242,7 +248,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             EN_ATTENTE: 'En attente',
             ENTRETIEN: 'Entretien',
             OFFRE_RECUE: 'Offre reçue',
-            ACCEPTEE: 'Acceptée',
+            ACCEPTEE: 'Acceptée 🎉',
             REFUSEE: 'Refusée',
             ABANDONNEE: 'Abandonnée',
           };
@@ -251,7 +257,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             id: `tl-${Date.now()}`,
             date: new Date().toISOString().substring(0, 10),
             title: `Statut : ${statusLabels[updates.status]}`,
-            description: `Le statut a été mis à jour de "${statusLabels[app.status]}" vers "${statusLabels[updates.status]}".`,
+            description: isFinalStatus
+              ? `Le statut a été mis à jour vers "${statusLabels[updates.status]}". Les rappels de relance ont été clôturés.`
+              : `Le statut a été mis à jour de "${statusLabels[app.status]}" vers "${statusLabels[updates.status]}".`,
             type: updates.status === 'OFFRE_RECUE' ? 'OFFER' : 'STATUS_CHANGE',
           };
           updated.timeline = [event, ...(updated.timeline || [])];
