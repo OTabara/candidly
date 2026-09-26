@@ -66,13 +66,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isMobileOpen, onCloseMobile })
       {isMobileOpen && (
         <div
           onClick={onCloseMobile}
-          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm transition-opacity md:hidden"
+          className="fixed inset-0 z-39 bg-slate-900/50 backdrop-blur-sm transition-opacity md:hidden"
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-[#D5E3E7] bg-[#E6F0F2] transition-transform duration-200 ease-in-out dark:border-slate-800 dark:bg-slate-900 md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-[#D5E3E7] bg-[#E6F0F2] transition-transform duration-200 ease-in-out dark:border-slate-800 dark:bg-slate-900 md:static md:translate-x-0 ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

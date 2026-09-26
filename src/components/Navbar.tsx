@@ -103,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-[#E1ECEE] bg-white/95 px-4 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 sm:px-6">
+    <header className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b border-[#E1ECEE] bg-white/95 px-4 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 sm:px-6">
       {/* Left: Mobile Menu & Logo */}
       <div className="flex items-center gap-3">
         <button
@@ -184,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar }) => {
 
           {/* Floating Notification Panel */}
           {showNotifications && (
-            <div className="absolute right-0 top-11 w-80 sm:w-96 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl dark:border-slate-800 dark:bg-slate-900 z-50">
+            <div className="fixed inset-x-3 top-16 md:absolute md:inset-auto md:right-0 md:top-11 w-auto md:w-96 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-800 dark:bg-slate-900 z-[60]">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <Bell className="h-4 w-4 text-teal-700 dark:text-teal-400" />

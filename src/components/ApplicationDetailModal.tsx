@@ -101,7 +101,7 @@ export const ApplicationDetailModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-hidden">
+    <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-hidden">
       <div className="relative w-full max-w-3xl max-h-[92vh] sm:max-h-[90vh] flex flex-col rounded-t-2xl sm:rounded-2xl bg-white shadow-2xl dark:bg-slate-900 border border-slate-200 dark:border-slate-800 my-0 sm:my-6 overflow-hidden">
         {/* Header Banner */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between border-b border-slate-200 p-4 sm:p-6 dark:border-slate-800 gap-3 sm:gap-4 shrink-0 bg-white dark:bg-slate-900">
