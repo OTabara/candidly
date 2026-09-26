@@ -4,19 +4,31 @@
   <br />
   <p><b>Une plateforme élégante et complète de suivi de candidatures et de gestion de carrière, conçue avec React 19, TypeScript, Tailwind CSS v4 et une architecture Spring Boot 3 & PostgreSQL.</b></p>
   <br />
+  <img src="docs/screenshots/dashboard.png" alt="Aperçu du Tableau de Bord Candidly" width="100%" />
+</div>
+
+---
+
+## 📸 Aperçu de l'Interface
+
+<div align="center">
+  <p><b>Tableau de Bord & KPIs</b></p>
+  <img src="docs/screenshots/dashboard.png" alt="Tableau de Bord Candidly" width="90%" />
+  <br /><br />
+  <p><b>Vue Kanban Glisser-Déposer</b></p>
+  <img src="docs/screenshots/kanban.png" alt="Vue Kanban Candidly" width="90%" />
+  <br /><br />
+  <p><b>Liste des Candidatures & Filtrage</b></p>
+  <img src="docs/screenshots/applications.png" alt="Liste des Candidatures Candidly" width="90%" />
 </div>
 
 ---
 
 ## Présentation du Projet
 
-13: **Candidly** est une application web moderne de suivi de candidatures conçue pour les candidats, alternants et professionnels. Basée sur une charte graphique sur-mesure aux teintes **Bleu Pétrole (`#185868`)**, **Turquoise (`#2A9D8F`)** et **Gris Glacier (`#E6F0F2`)**, Candidly propose un workflow fluide pour organiser vos démarches de recrutement, planifier vos entretiens, programmer vos relances et analyser vos ratios de conversion.
-14: 
-15: Conçu comme un projet personnel, Candidly réunit une interface utilisateur réactive (Single Page Application) et une vitrine complète d'architecture Backend (Java Spring Boot 3, Spring Security JWT et schéma PostgreSQL).
-...
-176: ## Contexte du Projet
-177: 
-178: Projet personnel développé pour offrir un outil moderne, élégant et performant de suivi de recherche d'emploi et de gestion de carrière.
+**Candidly** est une application web moderne de suivi de candidatures conçue pour les candidats, alternants et professionnels. Basée sur une charte graphique sur-mesure aux teintes **Bleu Pétrole (`#185868`)**, **Turquoise (`#2A9D8F`)** et **Gris Glacier (`#E6F0F2`)**, Candidly propose un workflow fluide pour organiser vos démarches de recrutement, planifier vos entretiens, programmer vos relances et analyser vos ratios de conversion.
+
+Conçu comme un projet personnel, Candidly réunit une interface utilisateur réactive (Single Page Application) et une vitrine complète d'architecture Backend (Java Spring Boot 3, Spring Security JWT et schéma PostgreSQL).
 
 ---
 
