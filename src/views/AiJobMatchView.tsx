@@ -18,9 +18,20 @@ import {
   MapPin,
   Tag,
   FileText,
+  MessageSquare,
+  Key,
+  Copy,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { analyzeJobOffer, AnalysisBreakdown } from '../utils/jobMatchEngine';
+import {
+  generateGeminiInterviewQuestions,
+  getGeminiApiKey,
+  saveGeminiApiKey,
+  GeneratedInterviewQuestion,
+} from '../services/geminiService';
 
 export const AiJobMatchView: React.FC = () => {
   const { userProfile, setIsAddModalOpen, setEditingApplication, addToast } = useApp();
@@ -29,6 +40,14 @@ export const AiJobMatchView: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [analysisResult, setAnalysisResult] = useState<AnalysisBreakdown | null>(null);
+
+  // Gemini API et questions d'entretien
+  const [questions, setQuestions] = useState<GeneratedInterviewQuestion[]>([]);
+  const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  const [usedGeminiApi, setUsedGeminiApi] = useState(false);
+  const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(null);
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState(getGeminiApiKey());
 
   // Sample real job offer templates for MIAGE profile
   const sampleJob1 = `Offre : Consultant Business Intelligence et Data (Stage fin d'études / CDI) - Wavestone Paris
@@ -61,6 +80,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
 
     setIsAnalyzing(true);
     setLoadingStep(1);
+    setQuestions([]); // reset questions on new analysis
 
     // Step-by-step progress animation for transparent UX
     setTimeout(() => {
@@ -80,12 +100,46 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
     }, 750);
   };
 
+  // Generate interview questions using Gemini API or local fallback
+  const handleGenerateQuestions = async () => {
+    if (!analysisResult || !jobText) return;
+
+    setIsGeneratingQuestions(true);
+    try {
+      const res = await generateGeminiInterviewQuestions(jobText, analysisResult, userProfile);
+      setQuestions(res.questions);
+      setUsedGeminiApi(res.usedApi);
+      if (res.usedApi) {
+        addToast('Questions d\'entretien sur-mesure générées via Google Gemini API !', 'success');
+      } else {
+        addToast('Questions d\'entretien préparatoires générées par le moteur local.', 'info');
+      }
+    } catch (e) {
+      console.error(e);
+      addToast('Erreur lors de la génération des questions.', 'error');
+    } finally {
+      setIsGeneratingQuestions(false);
+    }
+  };
+
+  const handleSaveApiKey = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveGeminiApiKey(apiKeyInput);
+    setShowApiKeyInput(false);
+    addToast('Clé d\'API Google Gemini enregistrée !', 'success');
+  };
+
   // Pre-fill existing Candidly ApplicationModal with extracted offer details
   const handleCreateApplicationFromJob = () => {
     if (!analysisResult) return;
 
     const detected = analysisResult.detectedJob;
     const today = new Date().toISOString().substring(0, 10);
+
+    let notesText = `Analyse AI Job Match : Score de correspondance ${analysisResult.scoreGlobal}% (${analysisResult.labelScore}). Compétences clés : ${analysisResult.exactMatches.join(', ')}.`;
+    if (questions.length > 0) {
+      notesText += `\n\nQuestions d'entretien préparées :\n` + questions.map((q, i) => `${i + 1}. ${q.question}`).join('\n');
+    }
 
     setEditingApplication({
       id: '',
@@ -97,7 +151,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
       applicationDate: today,
       status: 'A_CONTACTER',
       jobUrl: detected.jobUrl || '',
-      notes: `Analyse AI Job Match : Score de correspondance ${analysisResult.scoreGlobal}% (${analysisResult.labelScore}). Compétences clés : ${analysisResult.exactMatches.join(', ')}.`,
+      notes: notesText,
       tags: detected.tags.length > 0 ? detected.tags : ['AI Job Match'],
       createdAt: today,
       updatedAt: today,
@@ -113,38 +167,69 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
       <div>
         <div className="inline-flex items-center gap-2 rounded-full bg-[#E6F0F2] px-3.5 py-1 text-xs font-bold text-[#185868] dark:bg-cyan-950/60 dark:text-teal-300 mb-2">
           <Sparkles className="h-3.5 w-3.5 text-[#2A9D8F]" />
-          <span>Module d'analyse d'offres et d'aide à la décision</span>
+          <span>Module d'analyse d'offres, conseils et questions d'entretien</span>
         </div>
         <h1 className="text-xl font-extrabold tracking-tight text-[#164E63] dark:text-white sm:text-2xl">
-          AI Job Match : Analyseur d'Offre d'Emploi
+          AI Job Match : Analyseur d'Offre et Préparation d'Entretien
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          Collez le texte d'une offre d'emploi pour évaluer votre adéquation avec votre profil {userProfile.specialization || 'Master MIAGE'}, identifier vos points forts et préparer vos candidatures.
+          Collez le texte d'une offre d'emploi pour évaluer votre adéquation avec votre profil {userProfile.specialization || 'Master MIAGE'}, identifier vos points forts et générer vos questions d'entretien.
         </p>
       </div>
 
-      {/* Input Box & Templates */}
+      {/* Input Box et Templates */}
       <div className="rounded-2xl border border-[#E1ECEE] bg-[#FCFCFA] p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
         {/* Sample job buttons */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
-            Tester avec une offre exemple :
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+              Tester avec une offre exemple :
+            </span>
+            <button
+              type="button"
+              onClick={() => setJobText(sampleJob1)}
+              className="rounded-lg border border-slate-200 bg-[#F4EFE6] px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-[#EBE2D3] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition-colors"
+            >
+              Wavestone (Consultant BI)
+            </button>
+            <button
+              type="button"
+              onClick={() => setJobText(sampleJob2)}
+              className="rounded-lg border border-slate-200 bg-[#F4EFE6] px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-[#EBE2D3] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition-colors"
+            >
+              Orange Business (Process Mining)
+            </button>
+          </div>
+
+          {/* Configuration Clé Gemini API */}
           <button
             type="button"
-            onClick={() => setJobText(sampleJob1)}
-            className="rounded-lg border border-slate-200 bg-[#F4EFE6] px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-[#EBE2D3] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition-colors"
+            onClick={() => setShowApiKeyInput(!showApiKeyInput)}
+            className="flex items-center gap-1 text-[11px] font-semibold text-[#185868] hover:underline dark:text-teal-400"
           >
-            Wavestone (Consultant BI)
-          </button>
-          <button
-            type="button"
-            onClick={() => setJobText(sampleJob2)}
-            className="rounded-lg border border-slate-200 bg-[#F4EFE6] px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-[#EBE2D3] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition-colors"
-          >
-            Orange Business (Process Mining)
+            <Key className="h-3.5 w-3.5" />
+            <span>{getGeminiApiKey() ? 'Clé Gemini configurée' : 'Configurer clé Gemini API (Optionnel)'}</span>
           </button>
         </div>
+
+        {/* Input Clé Gemini API si déplié */}
+        {showApiKeyInput && (
+          <form onSubmit={handleSaveApiKey} className="rounded-xl border border-teal-200 bg-teal-50/50 p-3 dark:border-teal-900/60 dark:bg-slate-800/80 flex gap-2">
+            <input
+              type="password"
+              value={apiKeyInput}
+              onChange={(e) => setApiKeyInput(e.target.value)}
+              placeholder="Saisir votre clé Google Gemini API (ex: AIzaSy...)"
+              className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-[#164E63] px-4 py-1.5 text-xs font-bold text-white hover:bg-[#124552]"
+            >
+              Enregistrer
+            </button>
+          </form>
+        )}
 
         {/* Text Area */}
         <div className="relative">
@@ -201,7 +286,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
       {/* Analysis Results Display */}
       {analysisResult && !isAnalyzing && (
         <div className="space-y-6">
-          {/* Section 1: Score & Sub-scores */}
+          {/* Section 1: Score et Sub-scores */}
           <div className="rounded-2xl border border-teal-200 bg-[#FCFCFA] p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
               <div>
@@ -387,7 +472,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
             </div>
           </div>
 
-          {/* Section 3: "À mettre en avant" & "À préparer" */}
+          {/* Section 3: "À mettre en avant" et "À préparer" */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 📌 À mettre en avant dans votre candidature */}
             <div className="rounded-2xl border border-[#E1ECEE] bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
@@ -466,7 +551,123 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
             </div>
           </div>
 
-          {/* Section 4: Mots-clés & Recommandations */}
+          {/* Section 4: Générateur de Questions d'Entretien (avec Gemini API et Fallback Local) */}
+          <div className="rounded-2xl border border-teal-200 bg-[#FCFCFA] p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
+              <div>
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-[#2A9D8F]" />
+                  <h3 className="text-sm font-bold text-[#164E63] dark:text-white">
+                    Générateur de Questions d'Entretien Préparatoires
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Simulez les questions des recruteurs adaptées à l'offre et préparez vos réponses stratégiques.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                disabled={isGeneratingQuestions}
+                onClick={handleGenerateQuestions}
+                className="flex items-center gap-2 rounded-xl bg-[#164E63] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#124552] disabled:opacity-50 transition-colors shrink-0"
+              >
+                <Sparkles className="h-4 w-4 text-[#2A9D8F]" />
+                <span>
+                  {isGeneratingQuestions
+                    ? 'Génération...'
+                    : questions.length > 0
+                    ? 'Régénérer les questions'
+                    : 'Générer mes questions d\'entretien'}
+                </span>
+              </button>
+            </div>
+
+            {/* Accordion Questions List */}
+            {questions.length > 0 && (
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                    Questions d'entretien ciblées ({questions.length})
+                  </span>
+                  <span className="text-[10px] font-semibold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950 px-2 py-0.5 rounded-md">
+                    {usedGeminiApi ? '🤖 Mode IA (Google Gemini)' : '⚡ Mode Moteur Local'}
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {questions.map((q, idx) => {
+                    const isExpanded = expandedQuestionId === q.id;
+                    return (
+                      <div
+                        key={q.id || idx}
+                        className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-800/80 overflow-hidden transition-all"
+                      >
+                        {/* Question Header */}
+                        <div
+                          onClick={() => setExpandedQuestionId(isExpanded ? null : q.id)}
+                          className="flex cursor-pointer items-center justify-between p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#E6F0F2] text-xs font-bold text-[#164E63] dark:bg-cyan-950 dark:text-teal-300">
+                              Q{idx + 1}
+                            </span>
+                            <div>
+                              <p className="text-xs font-bold text-[#164E63] dark:text-white leading-snug">
+                                {q.question}
+                              </p>
+                              <span className="mt-1 inline-block rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                                {q.category}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            {isExpanded ? (
+                              <ChevronUp className="h-4 w-4 text-slate-400" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-slate-400" />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Question Content (Advice et Keypoints) */}
+                        {isExpanded && (
+                          <div className="border-t border-slate-100 bg-[#FCFCFA] p-4 text-xs dark:border-slate-700 dark:bg-slate-900/90 space-y-3">
+                            <div className="rounded-lg bg-teal-50/70 p-3 border border-teal-100 dark:bg-teal-950/40 dark:border-teal-900/40">
+                              <p className="font-bold text-teal-900 dark:text-teal-300 flex items-center gap-1.5 mb-0.5">
+                                <Lightbulb className="h-3.5 w-3.5 text-[#2A9D8F]" />
+                                Conseil du coach en entretien :
+                              </p>
+                              <p className="text-[11px] text-teal-800 dark:text-teal-200 leading-relaxed">
+                                {q.advice}
+                              </p>
+                            </div>
+
+                            <div>
+                              <p className="font-bold text-slate-800 dark:text-slate-200 mb-1.5">
+                                Points clés conseillés dans votre réponse :
+                              </p>
+                              <ul className="space-y-1 text-[11px] text-slate-600 dark:text-slate-300 pl-2">
+                                {q.suggestedAnswerKeypoints.map((kp, kIdx) => (
+                                  <li key={kIdx} className="flex items-start gap-2">
+                                    <span className="text-[#2A9D8F] font-bold">✓</span>
+                                    <span>{kp}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Section 5: Mots-clés et Recommandations */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 🔑 Mots-clés de l'offre */}
             <div className="rounded-2xl border border-[#E1ECEE] bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
