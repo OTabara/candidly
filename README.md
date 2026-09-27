@@ -29,7 +29,7 @@
 
 ## Présentation du Projet
 
-**Candidly** est une application web moderne de suivi de candidatures conçue pour les candidats, alternants et professionnels. Basée sur une charte graphique sur-mesure aux teintes **Bleu Pétrole (`#185868`)**, **Turquoise (`#2A9D8F`)** et **Gris Glacier (`#E6F0F2`)**, Candidly propose un workflow fluide pour organiser vos démarches de recrutement, planifier vos entretiens, programmer vos relances et analyser vos ratios de conversion.
+**Candidly** est une application web moderne de suivi de candidatures conçue pour les candidats, alternants et professionnels. Basée sur une charte graphique sur-mesure aux teintes **Bleu Pétrole (`#164E63` / `#185868`)**, **Turquoise (`#2A9D8F`)**, **Sable (`#F4EFE6`)**, **Ivoire (`#FCFCFA`)** et **Anthracite (`#263238`)**, Candidly propose un workflow fluide pour organiser vos démarches de recrutement, planifier vos entretiens, programmer vos relances et analyser vos ratios de conversion.
 
 Conçu comme un projet personnel, Candidly réunit une interface utilisateur réactive (Single Page Application) et une vitrine complète d'architecture Backend (Java Spring Boot 3, Spring Security JWT et schéma PostgreSQL).
 
@@ -63,9 +63,39 @@ Conçu comme un projet personnel, Candidly réunit une interface utilisateur ré
 - Calcul des taux de transformation (*Ratio Candidature ➔ Entretien*, *Ratio Entretien ➔ Offre*).
 - Temps de réponse moyen et analyse de l'alignement par domaine professionnel.
 
-### 6. AI Job Match et Simulateur d'Entretien
-- Simulation d'analyse d'adéquation CV/Offre avec score de matching et rédaction de lettre de motivation ciblée.
-- Générateur de questions d'entretien préparatoires basées sur la fiche de poste.
+### 6. Module AI Job Match (Analyseur d'Offres d'Emploi)
+Le module **AI Job Match** évolue d'un simple calcul d'adéquation vers un **outil décisionnel d'audit d'offres d'emploi et de préparation aux candidatures** (spécialement adapté aux profils M2 MIAGE et ingénierie de processus).
+
+#### Fonctionnement et Moteur Déterministe Local :
+- **Moteur d'Analyse Local** : Analyse le texte de l'offre d'emploi via un ensemble de règles sémantiques et d'expressions régulières strictes sans nécessiter d'API LLM externe.
+- **Normalisation Anti-Faux Positifs** :
+  - `Postgres` ➔ `PostgreSQL`
+  - `PowerBI` ➔ `Power BI`
+  - `JS` / `javascript` ➔ `JavaScript`
+  - `TS` / `typescript` ➔ `TypeScript`
+  - `Spring` ➔ `Spring Boot` (selon contexte)
+  - Limites de mots strictes empêchant de détecter `Java` lorsque seul `JavaScript` apparaît dans l'offre.
+- **Arbre Hiérarchique de Compétences (Knowledge Tree)** :
+  - *Famille JavaScript* : `JavaScript` ➔ `React`, `Node.js`, `TypeScript`, `Vue.js`
+  - *Famille SQL* : `SQL` ➔ `PostgreSQL`, `Oracle`, `MySQL`, `SQLite`
+  - *Famille Java* : `Java` ➔ `Spring Boot`, `Hibernate`, `Jakarta EE`
+  - *Famille BI et Processus* : `Business Intelligence` ➔ `Power BI`, `Tableau` ; `BPMN 2.0` ➔ `Process Mining`, `Celonis`
+- **Classification Tripartite** :
+  - **✓ Correspondances exactes** : Compétences demandées et présentes dans le profil.
+  - **◐ Correspondances partielles** : Liens hiérarchiques Parent ➔ Enfant (ex: profil a `SQL`, l'offre demande `PostgreSQL`), Enfant ➔ Parent (ex: profil a `PostgreSQL`, l'offre demande `SQL`), ou Fratrie (ex: profil a `React`, l'offre demande `JavaScript`).
+  - **! Compétences à renforcer** : Exigences clés absentes du profil.
+- **Score d'Adéquation Explicable (0 à 100 %)** :
+  - *Score Global* avec libellés adaptatifs (*0-39% Faible*, *40-59% Partielle*, *60-79% Bonne*, *80-100% Très bonne*).
+  - *Décomposition en 3 sous-scores* : **Compétences (50 %)**, **Mots-clés du poste (30 %)**, **Adéquation profil et domaine MIAGE (20 %)**.
+- **Restitution et Sections d'Aide à la Décision** :
+  - 📌 **À mettre en avant dans votre candidature** : Les 3 à 5 atouts majeurs du profil à valoriser en tête de CV et lors des entretiens.
+  - 📚 **À préparer avant de postuler** : Liste des points d'effort et des lacunes avec explications contextuelles.
+  - 🔑 **Mots-clés de l'offre** : Termes à intégrer dans le CV et la lettre de motivation.
+  - 💡 **Recommandations stratégiques** : Conseils personnalisés d'entretien.
+- **Intégration au Pipeline Candidly** :
+  - Bouton **« Enregistrer cette offre comme candidature »** alimentant automatiquement le formulaire `ApplicationModal` existant avec les informations extraites (entreprise, intitulé, domaine, type de contrat, localisation, tags, URL et résumé).
+- **Limites Actuelles et Feuille de Route** :
+  - Le système actuel est 100 % local et déterministe. Une passerelle optionnelle vers un modèle d'IA générative (ex: Gemini API) est envisagée comme **évolution future**.
 
 ### 7. Code Source Backend (Spring Boot 3 et PostgreSQL)
 - Visualisation de l'architecture backend complète comprenant :
@@ -79,10 +109,11 @@ Conçu comme un projet personnel, Candidly réunit une interface utilisateur ré
 
 ## Charte Graphique et Design System
 
-- **Couleur Principale** : Bleu Pétrole (`#185868`)
-- **Couleur d'Accent** : Turquoise (`#2A9D8F`)
-- **Fond Latéral et Badges** : Gris Glacier (`#E6F0F2`)
-- **Fond de l'Application** : Blanc Glacier (`#F3F7F8`)
+- **Bleu Pétrole** : `#164E63` / `#185868`
+- **Turquoise** : `#2A9D8F`
+- **Sable** : `#F4EFE6`
+- **Ivoire** : `#FCFCFA`
+- **Anthracite** : `#263238`
 - **Gestion des Thèmes** : Prise en charge des modes Clair et Sombre (Dark Mode).
 
 ---
@@ -165,12 +196,14 @@ candidly/
 │   ├── components/
 │   │   ├── Navbar.tsx            # Barre supérieure (recherche, notifications, mode sombre)
 │   │   ├── Sidebar.tsx           # Menu latéral avec citation botanique
-│   │   ├── ApplicationModal.tsx  # Formulaire d'ajout / modification
+│   │   ├── ApplicationModal.tsx  # Formulaire d'ajout et modification
 │   │   └── ToastContainer.tsx    # Système de notifications toast
 │   ├── data/
 │   │   └── initialData.ts        # Données de démonstration et constantes
 │   ├── types/
 │   │   └── index.ts              # Interfaces et types TypeScript
+│   ├── utils/
+│   │   └── jobMatchEngine.ts     # Moteur d'analyse déterministe et hiérarchie de compétences
 │   └── views/
 │       ├── DashboardView.tsx     # Tableau de bord principal (KPIs et graphiques)
 │       ├── ApplicationsView.tsx  # Liste des candidatures et export CSV
@@ -178,7 +211,7 @@ candidly/
 │       ├── CalendarView.tsx      # Calendrier mensuel des entretiens et relances
 │       ├── StatisticsView.tsx    # Statistiques et ratios de conversion
 │       ├── ProfileView.tsx       # Profil étudiant et compétences
-│       ├── AiJobMatchView.tsx    # Simulateur IA de matching et préparation
+│       ├── AiJobMatchView.tsx    # Analyseur IA de matching, scoring et conseils
 │       └── SpringBootCodeView.tsx# Code source backend Java Spring Boot et SQL
 ```
 
@@ -188,7 +221,7 @@ candidly/
 
 Candidly sauvegarde automatiquement toutes vos candidatures, informations de profil et préférences dans le stockage local de votre navigateur (`localStorage`). Vos données restent conservées d'une session à l'autre sans risque de perte.
 
-Pour démarrer votre propre suivi avec un espace vierge, cliquez sur **"Vider la démo"** dans la barre supérieure de navigation.
+Pour démarrer votre propre suivi avec un espace vierge, cliquez sur **"Vider la démo"** dans le menu latéral.
 
 ---
 
