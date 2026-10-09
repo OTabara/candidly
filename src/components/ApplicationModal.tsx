@@ -33,6 +33,7 @@ export const ApplicationModal: React.FC = () => {
   const [company, setCompany] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [contractType, setContractType] = useState<ContractType>('Stage');
+  const [customContractInput, setCustomContractInput] = useState('');
   const [domain, setDomain] = useState<Domain>('Data');
   const [location, setLocation] = useState('');
   const [applicationDate, setApplicationDate] = useState('');
@@ -71,12 +72,14 @@ export const ApplicationModal: React.FC = () => {
       setResumeUsed(editingApplication.resumeUsed || userProfile.primaryResume);
       setCoverLetterUsed(editingApplication.coverLetterUsed || '');
       setTagsInput(editingApplication.tags ? editingApplication.tags.join(', ') : '');
+      setCustomContractInput('');
     } else {
       // Default new form values
       const today = new Date().toISOString().substring(0, 10);
       setCompany('');
       setJobTitle('');
       setContractType('Stage');
+      setCustomContractInput('');
       setDomain('Business Intelligence');
       setLocation('Toulouse');
       setApplicationDate(today);
@@ -124,6 +127,12 @@ export const ApplicationModal: React.FC = () => {
       .split(',')
       .map((t) => t.trim())
       .filter((t) => t.length > 0);
+
+    if (contractType === 'Autre' && customContractInput.trim()) {
+      if (!tags.includes(customContractInput.trim())) {
+        tags.push(customContractInput.trim());
+      }
+    }
 
     const payload: Partial<JobApplication> = {
       company: company.trim(),
