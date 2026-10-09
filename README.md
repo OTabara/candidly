@@ -69,7 +69,7 @@ Le module **AI Job Match** analyse une offre et un profil candidat pour fournir 
 #### Analyse de compatibilité par IA :
 - **Analyse Gemini** : l'offre et les informations professionnelles du profil sont envoyées à l'API Google Gemini pour produire les scores, les correspondances et les conseils. L'analyse s'adapte au domaine décrit par l'offre au lieu de s'appuyer sur un dictionnaire de compétences prédéfini.
 - **Configuration** : une clé Google Gemini est nécessaire. Définissez `GEMINI_API_KEY` dans le fichier `.env` à la racine du projet. La clé reste côté serveur et n'est pas envoyée au navigateur. En l'absence de clé ou si l'API renvoie une réponse invalide, une erreur est affichée ; aucun score local de remplacement n'est présenté comme une analyse IA.
-- **API serveur** : `POST /api/job-match` analyse la compatibilité ; `POST /api/interview-questions` génère des questions, conseils et points de réponse à partir de la même offre, du résultat d'analyse et du profil. Les deux réponses Gemini sont validées avant affichage, sans repli vers des questions prédéfinies.
+- **API serveur** : `POST /api/job-match` analyse la compatibilité ; `POST /api/interview-questions` génère des questions, conseils et points de réponse à partir de la même offre, du résultat d'analyse et du profil. Ces endpoints fonctionnent en local via Express et sur Vercel via les fonctions sous `api/`. Sur Vercel, définissez `GEMINI_API_KEY` dans les variables d'environnement du projet puis redéployez. Les deux réponses Gemini sont validées avant affichage, sans repli vers des questions prédéfinies.
 - **Classification des compétences** :
   - **✓ Correspondances exactes** : Compétences demandées et présentes dans le profil.
   - **◐ Correspondances partielles** : Compétences transférables justifiées au regard des exigences de l'offre.
@@ -155,6 +155,10 @@ Le module **AI Job Match** analyse une offre et un profil candidat pour fournir 
 
 5. **Accéder à l'application** :
    Ouvrez votre navigateur sur [http://localhost:3000](http://localhost:3000)
+
+### Déploiement sur Vercel
+
+Les fonctions `api/job-match.js` et `api/interview-questions.js` exposent les endpoints utilisés par l'application. Dans les paramètres du projet Vercel, ajoutez `GEMINI_API_KEY` comme variable d'environnement pour les environnements concernés, puis redéployez. N'utilisez pas de préfixe `VITE_` pour cette clé : elle doit rester côté serveur.
 
 ### Build de Production
 
