@@ -64,29 +64,19 @@ Conçu comme un projet personnel, Candidly réunit une interface utilisateur ré
 - Temps de réponse moyen et analyse de l'alignement par domaine professionnel.
 
 ### 6. Module AI Job Match (Analyseur d'Offres d'Emploi)
-Le module **AI Job Match** évolue d'un simple calcul d'adéquation vers un **outil décisionnel d'audit d'offres d'emploi et de préparation aux candidatures** (spécialement adapté aux profils M2 MIAGE et ingénierie de processus).
+Le module **AI Job Match** analyse une offre et un profil candidat pour fournir une évaluation de compatibilité, des compétences transférables, des points à préparer et des recommandations, quel que soit le métier ou le secteur.
 
-#### Fonctionnement et Moteur Déterministe Local :
-- **Moteur d'Analyse Local** : Analyse le texte de l'offre d'emploi via un ensemble de règles sémantiques et d'expressions régulières strictes sans nécessiter d'API LLM externe.
-- **Normalisation Anti-Faux Positifs** :
-  - `Postgres` ➔ `PostgreSQL`
-  - `PowerBI` ➔ `Power BI`
-  - `JS` / `javascript` ➔ `JavaScript`
-  - `TS` / `typescript` ➔ `TypeScript`
-  - `Spring` ➔ `Spring Boot` (selon contexte)
-  - Limites de mots strictes empêchant de détecter `Java` lorsque seul `JavaScript` apparaît dans l'offre.
-- **Arbre Hiérarchique de Compétences (Knowledge Tree)** :
-  - *Famille JavaScript* : `JavaScript` ➔ `React`, `Node.js`, `TypeScript`, `Vue.js`
-  - *Famille SQL* : `SQL` ➔ `PostgreSQL`, `Oracle`, `MySQL`, `SQLite`
-  - *Famille Java* : `Java` ➔ `Spring Boot`, `Hibernate`, `Jakarta EE`
-  - *Famille BI et Processus* : `Business Intelligence` ➔ `Power BI`, `Tableau` ; `BPMN 2.0` ➔ `Process Mining`, `Celonis`
-- **Classification Tripartite** :
+#### Analyse de compatibilité par IA :
+- **Analyse Gemini** : l'offre et les informations professionnelles du profil sont envoyées à l'API Google Gemini pour produire les scores, les correspondances et les conseils. L'analyse s'adapte au domaine décrit par l'offre au lieu de s'appuyer sur un dictionnaire de compétences prédéfini.
+- **Configuration** : une clé Google Gemini est nécessaire. Définissez `GEMINI_API_KEY` dans le fichier `.env` à la racine du projet. La clé reste côté serveur et n'est pas envoyée au navigateur. En l'absence de clé ou si l'API renvoie une réponse invalide, une erreur est affichée ; aucun score local de remplacement n'est présenté comme une analyse IA.
+- **API serveur** : `POST /api/job-match` analyse la compatibilité ; `POST /api/interview-questions` génère des questions, conseils et points de réponse à partir de la même offre, du résultat d'analyse et du profil. Les deux réponses Gemini sont validées avant affichage, sans repli vers des questions prédéfinies.
+- **Classification des compétences** :
   - **✓ Correspondances exactes** : Compétences demandées et présentes dans le profil.
-  - **◐ Correspondances partielles** : Liens hiérarchiques Parent ➔ Enfant (ex: profil a `SQL`, l'offre demande `PostgreSQL`), Enfant ➔ Parent (ex: profil a `PostgreSQL`, l'offre demande `SQL`), ou Fratrie (ex: profil a `React`, l'offre demande `JavaScript`).
+  - **◐ Correspondances partielles** : Compétences transférables justifiées au regard des exigences de l'offre.
   - **! Compétences à renforcer** : Exigences clés absentes du profil.
 - **Score d'Adéquation Explicable (0 à 100 %)** :
   - *Score Global* avec libellés adaptatifs (*0-39% Faible*, *40-59% Partielle*, *60-79% Bonne*, *80-100% Très bonne*).
-  - *Décomposition en 3 sous-scores* : **Compétences (50 %)**, **Mots-clés du poste (30 %)**, **Adéquation profil et domaine MIAGE (20 %)**.
+  - *Décomposition en 3 sous-scores* : **Compétences (50 %)**, **Mots-clés du poste (30 %)** et **Adéquation du profil (20 %)**.
 - **Restitution et Sections d'Aide à la Décision** :
   - 📌 **À mettre en avant dans votre candidature** : Les 3 à 5 atouts majeurs du profil à valoriser en tête de CV et lors des entretiens.
   - 📚 **À préparer avant de postuler** : Liste des points d'effort et des lacunes avec explications contextuelles.
@@ -94,8 +84,6 @@ Le module **AI Job Match** évolue d'un simple calcul d'adéquation vers un **ou
   - 💡 **Recommandations stratégiques** : Conseils personnalisés d'entretien.
 - **Intégration au Pipeline Candidly** :
   - Bouton **« Enregistrer cette offre comme candidature »** alimentant automatiquement le formulaire `ApplicationModal` existant avec les informations extraites (entreprise, intitulé, domaine, type de contrat, localisation, tags, URL et résumé).
-- **Limites Actuelles et Feuille de Route** :
-  - Le système actuel est 100 % local et déterministe. Une passerelle optionnelle vers un modèle d'IA générative (ex: Gemini API) est envisagée comme **évolution future**.
 
 ### 7. Code Source Backend (Spring Boot 3 et PostgreSQL)
 - Visualisation de l'architecture backend complète comprenant :
@@ -155,12 +143,17 @@ Le module **AI Job Match** évolue d'un simple calcul d'adéquation vers un **ou
    npm install
    ```
 
-3. **Lancer le serveur de développement** :
+3. **Configurer la clé Gemini** dans le fichier `.env` à la racine du projet :
+   ```env
+   GEMINI_API_KEY=votre_cle_api_gemini
+   ```
+
+4. **Lancer le serveur de développement** :
    ```bash
    npm run dev
    ```
 
-4. **Accéder à l'application** :
+5. **Accéder à l'application** :
    Ouvrez votre navigateur sur [http://localhost:3000](http://localhost:3000)
 
 ### Build de Production
@@ -202,8 +195,10 @@ candidly/
 │   │   └── initialData.ts        # Données de démonstration et constantes
 │   ├── types/
 │   │   └── index.ts              # Interfaces et types TypeScript
-│   ├── utils/
-│   │   └── jobMatchEngine.ts     # Moteur d'analyse déterministe et hiérarchie de compétences
+│   ├── services/
+│   │   ├── geminiService.ts      # Génération des questions d'entretien
+│   │   └── jobMatchService.ts    # Client API pour l'analyse de compatibilité
+│   └── server.js                 # API Gemini et serveur Vite / production
 │   └── views/
 │       ├── DashboardView.tsx     # Tableau de bord principal (KPIs et graphiques)
 │       ├── ApplicationsView.tsx  # Liste des candidatures et export CSV

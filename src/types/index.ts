@@ -97,3 +97,46 @@ export type ViewTab =
   | 'profile'
   | 'ai-match'
   | 'spring-code';
+
+export interface AnalysisBreakdown {
+  scoreGlobal: number;
+  labelScore: string;
+  subScores: {
+    skillsScore: number;
+    keywordsScore: number;
+    profileDomainScore: number;
+  };
+  detectedJob: {
+    company?: string;
+    jobTitle?: string;
+    domain?: string;
+    contractType?: string;
+    location?: string;
+    jobUrl?: string;
+    tags: string[];
+    experienceRequired?: string;
+  };
+  exactMatches: string[];
+  partialMatches: {
+    skill: string;
+    targetSkill: string;
+    reason: string;
+  }[];
+  missingSkills: {
+    skill: string;
+    importance: 'Haute' | 'Moyenne' | 'Essentielle';
+    reason: string;
+  }[];
+  keywords: string[];
+  topStrengthsToHighlight: {
+    title: string;
+    description: string;
+  }[];
+  elementsToPrepare: {
+    item: string;
+    statusType: 'Manquante' | 'Partielle' | 'Exigence';
+    explanation: string;
+  }[];
+  recommendations: string[];
+  summaryText: string;
+}

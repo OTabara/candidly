@@ -19,35 +19,35 @@ import {
   Tag,
   FileText,
   MessageSquare,
-  Key,
   Copy,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { analyzeJobOffer, AnalysisBreakdown } from '../utils/jobMatchEngine';
 import {
   generateGeminiInterviewQuestions,
-  getGeminiApiKey,
-  saveGeminiApiKey,
   GeneratedInterviewQuestion,
 } from '../services/geminiService';
+import { analyzeJobOfferWithApi } from '../services/jobMatchService';
+import { AnalysisBreakdown, ContractType } from '../types';
 
 export const AiJobMatchView: React.FC = () => {
   const { userProfile, setIsAddModalOpen, setEditingApplication, addToast } = useApp();
 
   const [jobText, setJobText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [loadingStep, setLoadingStep] = useState(0);
   const [analysisResult, setAnalysisResult] = useState<AnalysisBreakdown | null>(null);
 
   // Gemini API et questions d'entretien
   const [questions, setQuestions] = useState<GeneratedInterviewQuestion[]>([]);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
-  const [usedGeminiApi, setUsedGeminiApi] = useState(false);
   const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(null);
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
-  const [apiKeyInput, setApiKeyInput] = useState(getGeminiApiKey());
+
+  const updateJobText = (text: string) => {
+    setJobText(text);
+    setAnalysisResult(null);
+    setQuestions([]);
+  };
 
   // Sample real job offer templates for MIAGE profile
   const sampleJob1 = `Offre : Consultant Business Intelligence et Data (Stage fin d'études / CDI) - Wavestone Paris
@@ -70,7 +70,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
 - Analyser les KPIs de performance et collaborer avec les directions métiers.
 - Compétences demandées : SQL, PostgreSQL, Python, Docker, modélisation BPMN, outils BI.`;
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!jobText.trim()) return;
 
     if (jobText.trim().length < 30) {
@@ -79,54 +79,41 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
     }
 
     setIsAnalyzing(true);
-    setLoadingStep(1);
-    setQuestions([]); // reset questions on new analysis
-
-    // Step-by-step progress animation for transparent UX
-    setTimeout(() => {
-      setLoadingStep(2);
-    }, 250);
-
-    setTimeout(() => {
-      setLoadingStep(3);
-    }, 500);
-
-    setTimeout(() => {
-      const result = analyzeJobOffer(jobText, userProfile);
+    setAnalysisResult(null);
+    setQuestions([]);
+    try {
+      const result = await analyzeJobOfferWithApi(jobText, userProfile);
       setAnalysisResult(result);
+      addToast('Analyse de compatibilité par IA terminée !', 'success');
+    } catch (error) {
+      console.error(error);
+      addToast(
+        error instanceof Error ? error.message : "Erreur lors de l'analyse de l'offre.",
+        'error'
+      );
+    } finally {
       setIsAnalyzing(false);
-      setLoadingStep(0);
-      addToast('Analyse de correspondance terminée !', 'success');
-    }, 750);
+    }
   };
 
-  // Generate interview questions using Gemini API or local fallback
+  // Generate questions from the current job offer using Gemini.
   const handleGenerateQuestions = async () => {
     if (!analysisResult || !jobText) return;
 
     setIsGeneratingQuestions(true);
     try {
-      const res = await generateGeminiInterviewQuestions(jobText, analysisResult, userProfile);
-      setQuestions(res.questions);
-      setUsedGeminiApi(res.usedApi);
-      if (res.usedApi) {
-        addToast('Questions d\'entretien sur-mesure générées via Google Gemini API !', 'success');
-      } else {
-        addToast('Questions d\'entretien préparatoires générées par le moteur local.', 'info');
-      }
-    } catch (e) {
-      console.error(e);
-      addToast('Erreur lors de la génération des questions.', 'error');
+      const generatedQuestions = await generateGeminiInterviewQuestions(jobText, analysisResult, userProfile);
+      setQuestions(generatedQuestions);
+      addToast('Questions d\'entretien personnalisées générées pour cette offre !', 'success');
+    } catch (error) {
+      console.error(error);
+      addToast(
+        error instanceof Error ? error.message : 'Erreur lors de la génération des questions.',
+        'error'
+      );
     } finally {
       setIsGeneratingQuestions(false);
     }
-  };
-
-  const handleSaveApiKey = (e: React.FormEvent) => {
-    e.preventDefault();
-    saveGeminiApiKey(apiKeyInput);
-    setShowApiKeyInput(false);
-    addToast('Clé d\'API Google Gemini enregistrée !', 'success');
   };
 
   // Pre-fill existing Candidly ApplicationModal with extracted offer details
@@ -135,6 +122,10 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
 
     const detected = analysisResult.detectedJob;
     const today = new Date().toISOString().substring(0, 10);
+    const contractTypes: ContractType[] = ['Stage', 'Alternance', 'CDI', 'CDD', 'Autre'];
+    const contractType = contractTypes.find(
+      (type) => type.toLowerCase() === detected.contractType?.toLowerCase()
+    ) || 'Autre';
 
     let notesText = `Analyse AI Job Match : Score de correspondance ${analysisResult.scoreGlobal}% (${analysisResult.labelScore}). Compétences clés : ${analysisResult.exactMatches.join(', ')}.`;
     if (questions.length > 0) {
@@ -145,8 +136,8 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
       id: '',
       company: detected.company || '',
       jobTitle: detected.jobTitle || 'Poste Analysé (AI Job Match)',
-      contractType: (detected.contractType as any) || 'Stage',
-      domain: (detected.domain as any) || 'Business Intelligence',
+      contractType,
+      domain: detected.domain || userProfile.targetDomains[0] || 'Autre',
       location: detected.location || 'France',
       applicationDate: today,
       status: 'A_CONTACTER',
@@ -187,56 +178,32 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
             </span>
             <button
               type="button"
-              onClick={() => setJobText(sampleJob1)}
+              onClick={() => updateJobText(sampleJob1)}
               className="rounded-lg border border-slate-200 bg-[#F4EFE6] px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-[#EBE2D3] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition-colors"
             >
               Wavestone (Consultant BI)
             </button>
             <button
               type="button"
-              onClick={() => setJobText(sampleJob2)}
+              onClick={() => updateJobText(sampleJob2)}
               className="rounded-lg border border-slate-200 bg-[#F4EFE6] px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-[#EBE2D3] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 transition-colors"
             >
               Orange Business (Process Mining)
             </button>
           </div>
 
-          {/* Configuration Clé Gemini API */}
-          <button
-            type="button"
-            onClick={() => setShowApiKeyInput(!showApiKeyInput)}
-            className="flex items-center gap-1 text-[11px] font-semibold text-[#185868] hover:underline dark:text-teal-400"
-          >
-            <Key className="h-3.5 w-3.5" />
-            <span>{getGeminiApiKey() ? 'Clé Gemini configurée' : 'Configurer clé Gemini API (Optionnel)'}</span>
-          </button>
+          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 px-2.5 py-1 rounded-lg border border-teal-200/50 dark:border-teal-900/50">
+            <Sparkles className="h-3.5 w-3.5 text-[#2A9D8F]" />
+            <span>Analyse par API Gemini</span>
+          </div>
         </div>
-
-        {/* Input Clé Gemini API si déplié */}
-        {showApiKeyInput && (
-          <form onSubmit={handleSaveApiKey} className="rounded-xl border border-teal-200 bg-teal-50/50 p-3 dark:border-teal-900/60 dark:bg-slate-800/80 flex gap-2">
-            <input
-              type="password"
-              value={apiKeyInput}
-              onChange={(e) => setApiKeyInput(e.target.value)}
-              placeholder="Saisir votre clé Google Gemini API (ex: AIzaSy...)"
-              className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-            />
-            <button
-              type="submit"
-              className="rounded-lg bg-[#164E63] px-4 py-1.5 text-xs font-bold text-white hover:bg-[#124552]"
-            >
-              Enregistrer
-            </button>
-          </form>
-        )}
 
         {/* Text Area */}
         <div className="relative">
           <textarea
             rows={7}
             value={jobText}
-            onChange={(e) => setJobText(e.target.value)}
+            onChange={(e) => updateJobText(e.target.value)}
             placeholder="Collez ici l'intitulé, les missions et le profil recherché de l'offre d'emploi..."
             className="w-full rounded-xl border border-slate-300 p-4 text-xs focus:ring-2 focus:ring-[#2A9D8F] dark:border-slate-700 dark:bg-slate-800 dark:text-white leading-relaxed font-sans"
           />
@@ -264,7 +231,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
         </div>
       </div>
 
-      {/* Loading Step Animation State */}
+      {/* Analyse API en cours */}
       {isAnalyzing && (
         <div className="rounded-2xl border border-teal-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 text-center space-y-4">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#E6F0F2] text-[#164E63] animate-spin">
@@ -272,12 +239,10 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
           </div>
           <div>
             <h3 className="text-sm font-bold text-[#164E63] dark:text-white">
-              Analyse déterministe de l'offre d'emploi...
+            Analyse Gemini de l'offre d'emploi...
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              {loadingStep === 1 && "Extraction des compétences et des mots-clés de l'offre..."}
-              {loadingStep === 2 && "Comparaison avec l'arbre hiérarchique de vos compétences..."}
-              {loadingStep === 3 && "Calcul du score explicable et génération des conseils..."}
+            Le serveur compare les exigences du poste à votre profil avec Gemini, quel que soit le domaine.
             </p>
           </div>
         </div>
@@ -551,7 +516,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
             </div>
           </div>
 
-          {/* Section 4: Générateur de Questions d'Entretien (avec Gemini API et Fallback Local) */}
+          {/* Section 4: Questions d'entretien personnalisées selon l'offre */}
           <div className="rounded-2xl border border-teal-200 bg-[#FCFCFA] p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 space-y-5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
               <div>
@@ -562,7 +527,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
                   </h3>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Simulez les questions des recruteurs adaptées à l'offre et préparez vos réponses stratégiques.
+                  Gemini formule des questions à partir des missions, des compétences demandées et de votre profil, puis propose des pistes de réponse.
                 </p>
               </div>
 
@@ -591,7 +556,7 @@ Dans le cadre de l'optimisation des flux de facturation télécom, vos missions 
                     Questions d'entretien ciblées ({questions.length})
                   </span>
                   <span className="text-[10px] font-semibold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950 px-2 py-0.5 rounded-md">
-                    {usedGeminiApi ? '🤖 Mode IA (Google Gemini)' : '⚡ Mode Moteur Local'}
+                    🤖 Questions personnalisées par Gemini
                   </span>
                 </div>
 
